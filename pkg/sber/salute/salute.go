@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/a-kuleshov/treplo/pkg/sber/salute/token"
+	"github.com/a-kuleshov/treplo/pkg/sber/token"
 )
 
 type tokenStorage interface {
@@ -16,7 +16,7 @@ type speachService struct {
 }
 
 func StartSpeachService(ctx context.Context, clientSecret string) (*speachService, error) {
-	tokenStorage, err := token.NewStorage(ctx, clientSecret)
+	tokenStorage, err := token.NewStorage(ctx, clientSecret, token.ScopeSaluteSpeech)
 	if err != nil {
 		return nil, fmt.Errorf("token.NewStorage: %w", err)
 	}

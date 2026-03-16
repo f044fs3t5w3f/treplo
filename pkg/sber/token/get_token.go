@@ -11,14 +11,14 @@ import (
 	"github.com/google/uuid"
 )
 
-const scope = "SALUTE_SPEECH_PERS"
+const ScopeSaluteSpeech = "SALUTE_SPEECH_PERS"
 
 func generateRqUID() string {
 	u4 := uuid.New()
 	return u4.String()
 }
 
-func getAccessToken(clientSecret string) (accessToken string, expiresAt time.Time, err error) {
+func getAccessToken(clientSecret string, scope string) (accessToken string, expiresAt time.Time, err error) {
 	url := "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
 
 	payload := strings.NewReader("scope=" + scope)
