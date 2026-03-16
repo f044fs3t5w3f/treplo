@@ -4,15 +4,20 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/a-kuleshov/treplo/internal/mechanics"
 	tgBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
+// type mechanicService interface {
+// 	SaveFile(ctx context.Context, chatID int64, fileID string) error
+// }
+
 type Processor struct {
-	service  mechanicService
+	service  *mechanics.Mechanics
 	tgBotApi *tgBotApi.BotAPI
 }
 
-func NewProcessor(ctx context.Context, service mechanicService, tgBotApi *tgBotApi.BotAPI) *Processor {
+func NewProcessor(ctx context.Context, service *mechanics.Mechanics, tgBotApi *tgBotApi.BotAPI) *Processor {
 	return &Processor{
 		service:  service,
 		tgBotApi: tgBotApi,
@@ -32,7 +37,7 @@ func (p *Processor) Process(ctx context.Context, update tgBotApi.Update) error {
 	} else {
 		return nil
 	}
-	err := p.service.AddAudio(ctx, message.Chat.ID, fileID)
+	err := p.service.SaveFile(ctx, message.Chat.ID, fileID)
 	if err != nil {
 		return fmt.Errorf("service.AddAudio: %w", err)
 	}

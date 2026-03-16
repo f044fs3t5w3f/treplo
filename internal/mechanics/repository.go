@@ -1,7 +1,11 @@
 package mechanics
 
-import "context"
+import (
+	"context"
+
+	"github.com/a-kuleshov/treplo/internal/models"
+)
 
 type Repository interface {
-	AddAudio(ctx context.Context, chatID int64, fileID string) error
+	SaveFile(ctx context.Context, file *models.File) error
 }
