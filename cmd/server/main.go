@@ -8,16 +8,16 @@ import (
 
 	"log/slog"
 
-	"github.com/a-kuleshov/treplo/internal/service"
+	"github.com/a-kuleshov/treplo/internal/treplo"
 	"github.com/a-kuleshov/treplo/pkg/configuration"
 )
 
 func main() {
-	var config service.Config
+	var config treplo.Config
 	configuration.ScanConfig(&config, nil)
 	fmt.Println(config)
 
-	treploSerivce, err := service.NewService(config)
+	treploSerivce, err := treplo.NewService(config)
 	if err != nil {
 		slog.Error(err.Error())
 	}

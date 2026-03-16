@@ -1,4 +1,4 @@
-package service
+package treplo
 
 type Config struct {
 	DatabaseDSN                  string `env:"DATABASE_DSN" flag:"d" jsonConfig:"database_dsn" default:"" description:"Database connection string"`
