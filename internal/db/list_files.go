@@ -9,7 +9,7 @@ import (
 
 func (r *repository) ListFiles(ctx context.Context) ([]models.File, error) {
 	rows, err := r.db.QueryContext(ctx, `
-		SELECT id, chat_id, file_id, filepath, salute_id FROM files
+		SELECT id, chat_id, file_id, filepath, salute_id,recognize_task_id, recognize_status  FROM files
 	`)
 	if err != nil {
 		return nil, err
@@ -21,7 +21,7 @@ func (r *repository) ListFiles(ctx context.Context) ([]models.File, error) {
 	files := make([]models.File, 0)
 	for rows.Next() {
 		file := models.File{}
-		if err := rows.Scan(&file.ID, &file.ChatID, &file.FileID, &file.Filepath, &file.SaluteId); err != nil {
+		if err := rows.Scan(&file.ID, &file.ChatID, &file.FileID, &file.Filepath, &file.SaluteId, &file.RecognizeTaskID, &file.RecognizeStatus); err != nil {
 			return nil, fmt.Errorf("rows.Scan: %w", err)
 		}
 		files = append(files, file)
