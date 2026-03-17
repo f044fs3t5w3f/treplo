@@ -7,8 +7,8 @@ import (
 	"sync"
 
 	"github.com/a-kuleshov/treplo/internal/db"
-	"github.com/a-kuleshov/treplo/internal/file_processor"
 	"github.com/a-kuleshov/treplo/internal/mechanics"
+	"github.com/a-kuleshov/treplo/internal/pipe"
 	"github.com/a-kuleshov/treplo/internal/tg"
 	"github.com/a-kuleshov/treplo/pkg/sber/salute"
 	tgBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -64,7 +64,7 @@ func (t *Treplo) Run() error {
 		panic(err)
 	}
 
-	processors := file_processor.NewProcessors(repository, tgbotapi.GetFileDirectURL, speechService)
+	processors := pipe.NewPipe(repository, tgbotapi.GetFileDirectURL, speechService)
 
 	mchncs := mechanics.NewMechanics(repository, processors)
 	processor := tg.NewProcessor(ctx, mchncs, tgbotapi)

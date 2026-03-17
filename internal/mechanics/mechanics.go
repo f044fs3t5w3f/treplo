@@ -4,16 +4,16 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/a-kuleshov/treplo/internal/file_processor"
 	"github.com/a-kuleshov/treplo/internal/models"
+	"github.com/a-kuleshov/treplo/internal/pipe"
 )
 
 type Mechanics struct {
 	repo          Repository
-	fileProcessor file_processor.FileProcessor
+	fileProcessor pipe.FileProcessor
 }
 
-func NewMechanics(repo Repository, fileProcessor file_processor.FileProcessor) *Mechanics {
+func NewMechanics(repo Repository, fileProcessor pipe.FileProcessor) *Mechanics {
 	return &Mechanics{
 		repo:          repo,
 		fileProcessor: fileProcessor,

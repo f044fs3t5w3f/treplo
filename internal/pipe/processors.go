@@ -1,13 +1,13 @@
-package file_processor
+package pipe
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/a-kuleshov/treplo/internal/file_processor/downloader"
-	"github.com/a-kuleshov/treplo/internal/file_processor/recognizer"
-	"github.com/a-kuleshov/treplo/internal/file_processor/uploader"
 	"github.com/a-kuleshov/treplo/internal/models"
+	"github.com/a-kuleshov/treplo/internal/pipe/downloader"
+	"github.com/a-kuleshov/treplo/internal/pipe/recognizer"
+	"github.com/a-kuleshov/treplo/internal/pipe/uploader"
 	"github.com/a-kuleshov/treplo/pkg/sber/salute"
 )
 
@@ -24,7 +24,7 @@ type processors struct {
 	repo       repository
 }
 
-func NewProcessors(repo repository, getFileURL downloader.GetFileURLfunc, saluteApi *salute.SpeachService) processors {
+func NewPipe(repo repository, getFileURL downloader.GetFileURLfunc, saluteApi *salute.SpeachService) processors {
 	return processors{
 		processors: []FileProcessor{
 			downloader.NewDownloader(getFileURL),
