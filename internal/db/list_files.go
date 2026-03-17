@@ -1,0 +1,30 @@
+package db
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/a-kuleshov/treplo/internal/models"
+)
+
+func (r *repository) ListFiles(ctx context.Context) ([]models.File, error) {
+	rows, err := r.db.QueryContext(ctx, `
+		SELECT id, chat_id, file_id, filepath, salute_id FROM files
+	`)
+	if err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	files := make([]models.File, 0)
+	for rows.Next() {
+		file := models.File{}
+		if err := rows.Scan(&file.ID, &file.ChatID, &file.FileID, &file.Filepath, &file.SaluteId); err != nil {
+			return nil, fmt.Errorf("rows.Scan: %w", err)
+		}
+		files = append(files, file)
+	}
+	return files, nil
+}

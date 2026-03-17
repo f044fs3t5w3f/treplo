@@ -41,7 +41,5 @@ func (p *Processor) Process(ctx context.Context, update tgBotApi.Update) error {
 	if err != nil {
 		return fmt.Errorf("service.AddAudio: %w", err)
 	}
-	fileConfig := tgBotApi.FileConfig{FileID: fileID}
-	p.tgBotApi.GetFile(fileConfig)
 	return nil
 }

@@ -7,8 +7,10 @@ import (
 	"sync"
 
 	"github.com/a-kuleshov/treplo/internal/db"
+	"github.com/a-kuleshov/treplo/internal/file_processor"
 	"github.com/a-kuleshov/treplo/internal/mechanics"
 	"github.com/a-kuleshov/treplo/internal/tg"
+	"github.com/a-kuleshov/treplo/pkg/sber/salute"
 	tgBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -49,13 +51,22 @@ func (t *Treplo) Run() error {
 	if repository == nil {
 		panic("No repository")
 	}
-	mchncs := mechanics.NewMechanics(repository)
 
 	tgbotapi, err := tgBotApi.NewBotAPI(t.config.TgToken)
+
 	if err != nil {
 		slog.Error("tgbotapi.NewBotAPI", "error", err)
 		panic(err)
 	}
+	speechService, err := salute.StartSpeachService(ctx, t.config.SaluteSpeechAuthorizationKey)
+	if err != nil {
+		slog.Error("salute.StartSpeachService", "error", err)
+		panic(err)
+	}
+
+	processors := file_processor.NewProcessors(repository, tgbotapi.GetFileDirectURL, speechService)
+
+	mchncs := mechanics.NewMechanics(repository, processors)
 	processor := tg.NewProcessor(ctx, mchncs, tgbotapi)
 	runTGBot(ctx, t.wg, tgbotapi, processor)
 

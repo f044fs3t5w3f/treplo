@@ -4,15 +4,20 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/a-kuleshov/treplo/internal/file_processor"
 	"github.com/a-kuleshov/treplo/internal/models"
 )
 
 type Mechanics struct {
-	repo Repository
+	repo          Repository
+	fileProcessor file_processor.FileProcessor
 }
 
-func NewMechanics(repo Repository) *Mechanics {
-	return &Mechanics{repo: repo}
+func NewMechanics(repo Repository, fileProcessor file_processor.FileProcessor) *Mechanics {
+	return &Mechanics{
+		repo:          repo,
+		fileProcessor: fileProcessor,
+	}
 }
 
 func (m *Mechanics) SaveFile(ctx context.Context, chatID int64, fileID string) error {
@@ -24,5 +29,8 @@ func (m *Mechanics) SaveFile(ctx context.Context, chatID int64, fileID string) e
 	if err != nil {
 		return fmt.Errorf("repo.SaveFile: %w", err)
 	}
+
+	m.fileProcessor.Process(ctx, &file)
+
 	return nil
 }

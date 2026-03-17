@@ -8,15 +8,35 @@ import (
 )
 
 func (r *repository) SaveFile(ctx context.Context, file *models.File) error {
-	result := r.db.QueryRowContext(ctx, `
-INSERT INTO 
-files (chat_id, file_id)
-VALUES ($1, $2)
-RRETURNING id`, file.ChatID, file.FileID)
-	err := result.Err()
-	if err != nil {
-		return fmt.Errorf("db.QueryRowContext: %w", err)
+	if file.ID == 0 {
+		result := r.db.QueryRowContext(ctx, `
+			INSERT INTO 
+			files (chat_id, file_id)
+			VALUES ($1, $2)
+			RETURNING id`, file.ChatID, file.FileID)
+		err := result.Err()
+		if err != nil {
+			return fmt.Errorf("db.QueryRowContext: %w", err)
+		}
+		err = result.Scan(&file.ID)
+		if err != nil {
+			return fmt.Errorf("result.Scan: %w", err)
+		}
+	} else {
+		_, err := r.db.ExecContext(ctx, `
+			UPDATE files 
+			SET 
+				file_id = $1, 
+				filepath = $2, 
+				salute_id = $3,
+				recognize_task_id = $4,
+				recognize_status = $5
+			WHERE id = $6`,
+			file.FileID, file.Filepath, file.SaluteId, file.RecognizeTaskID, file.RecognizeStatus,
+			file.ID)
+		if err != nil {
+			return fmt.Errorf("db.ExecContext: %w", err)
+		}
 	}
-	err = result.Scan(&file.ID)
-	return err
+	return nil
 }

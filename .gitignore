@@ -2,3 +2,5 @@ config.json
 .vscode
 .DS_Store
 storage
+
+cmd/debug
