@@ -6,8 +6,9 @@ import (
 
 	"github.com/a-kuleshov/treplo/internal/models"
 	"github.com/a-kuleshov/treplo/internal/pipe/downloader"
-	"github.com/a-kuleshov/treplo/internal/pipe/recognizer"
+	"github.com/a-kuleshov/treplo/internal/pipe/tasker"
 	"github.com/a-kuleshov/treplo/internal/pipe/uploader"
+	"github.com/a-kuleshov/treplo/internal/pipe/waiter"
 	"github.com/a-kuleshov/treplo/pkg/sber/salute"
 )
 
@@ -29,7 +30,8 @@ func NewPipe(repo repository, getFileURL downloader.GetFileURLfunc, saluteApi *s
 		processors: []FileProcessor{
 			downloader.NewDownloader(getFileURL),
 			&uploader.FileUploader{Uploader: saluteApi},
-			&recognizer.Recognizer{Recognizer: saluteApi},
+			&tasker.Tasker{Tasker: saluteApi},
+			&waiter.Waiter{StatusChecker: saluteApi},
 		},
 		repo: repo,
 	}
