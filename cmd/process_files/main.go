@@ -32,13 +32,16 @@ func main() {
 		panic(err)
 	}
 
-	pipe := pipe.NewPipe(repo, tgbotapi.GetFileDirectURL, speachService)
+	pipe := pipe.NewPipe(repo, tgbotapi, speachService)
 
 	files, err := repo.ListFiles(context.Background())
 	if err != nil {
 		panic(err)
 	}
 	for _, file := range files {
-		pipe.Process(context.Background(), &file)
+		err := pipe.Process(context.Background(), &file)
+		if err != nil {
+			slog.Error(err.Error())
+		}
 	}
 }

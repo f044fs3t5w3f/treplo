@@ -1,4 +1,4 @@
-package mechanics
+package business_logic
 
 import (
 	"context"

@@ -7,10 +7,12 @@ import (
 	"github.com/a-kuleshov/treplo/internal/models"
 	"github.com/a-kuleshov/treplo/internal/pipe/content_downloader"
 	"github.com/a-kuleshov/treplo/internal/pipe/downloader"
+	"github.com/a-kuleshov/treplo/internal/pipe/notifier"
 	"github.com/a-kuleshov/treplo/internal/pipe/tasker"
 	"github.com/a-kuleshov/treplo/internal/pipe/uploader"
 	"github.com/a-kuleshov/treplo/internal/pipe/waiter"
 	"github.com/a-kuleshov/treplo/pkg/sber/salute"
+	tgBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type pipe struct {
@@ -18,14 +20,26 @@ type pipe struct {
 	repo       repository
 }
 
-func NewPipe(repo repository, getFileURL downloader.GetFileURLfunc, saluteApi *salute.SpeachService) pipe {
+type tgNotifier struct {
+	tgbotapi *tgBotApi.BotAPI
+}
+
+func (tn tgNotifier) Notify(replyToMessageId int, chatId int64, message string) error {
+	tgMessage := tgBotApi.NewMessage(chatId, message)
+	tgMessage.ReplyToMessageID = replyToMessageId
+	_, err := tn.tgbotapi.Send(tgMessage)
+	return err
+}
+
+func NewPipe(repo repository, tgbotapi *tgBotApi.BotAPI, saluteApi *salute.SpeachService) pipe {
 	return pipe{
 		processors: []FileProcessor{
-			downloader.NewDownloader(getFileURL),
+			downloader.NewDownloader(tgbotapi.GetFileDirectURL),
 			&uploader.FileUploader{Uploader: saluteApi},
 			&tasker.Tasker{Tasker: saluteApi},
 			&waiter.Waiter{StatusChecker: saluteApi},
 			&content_downloader.Tasker{Downloader: saluteApi},
+			&notifier.NotifyProccessor{Notifier: tgNotifier{tgbotapi: tgbotapi}},
 		},
 		repo: repo,
 	}

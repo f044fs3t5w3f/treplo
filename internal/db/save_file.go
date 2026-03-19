@@ -11,9 +11,9 @@ func (r *repository) SaveFile(ctx context.Context, file *models.File) error {
 	if file.ID == 0 {
 		result := r.db.QueryRowContext(ctx, `
 			INSERT INTO 
-			files (chat_id, file_id)
-			VALUES ($1, $2)
-			RETURNING id`, file.ChatID, file.FileID)
+			files (chat_id, file_id, message_id)
+			VALUES ($1, $2, $3)
+			RETURNING id`, file.ChatID, file.FileID, file.MessageID)
 		err := result.Err()
 		if err != nil {
 			return fmt.Errorf("db.QueryRowContext: %w", err)
@@ -32,9 +32,10 @@ func (r *repository) SaveFile(ctx context.Context, file *models.File) error {
 				recognize_task_id = $4,
 				recognize_status = $5,
 				response_file_id = $6,
-				dialogue_content = $7
-			WHERE id = $8`,
-			file.FileID, file.Filepath, file.SaluteId, file.RecognizeTaskID, file.RecognizeStatus, file.ResponseFileID, file.Content,
+				dialogue_content = $7,
+				process_notification_sent = $8
+			WHERE id = $9`,
+			file.FileID, file.Filepath, file.SaluteId, file.RecognizeTaskID, file.RecognizeStatus, file.ResponseFileID, file.Content, file.ProcessNotificationSent,
 			file.ID)
 		if err != nil {
 			return fmt.Errorf("db.ExecContext: %w", err)

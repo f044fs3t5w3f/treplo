@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"sync"
 
+	"github.com/a-kuleshov/treplo/internal/business_logic"
 	"github.com/a-kuleshov/treplo/internal/db"
-	"github.com/a-kuleshov/treplo/internal/mechanics"
 	"github.com/a-kuleshov/treplo/internal/pipe"
 	"github.com/a-kuleshov/treplo/internal/tg"
 	"github.com/a-kuleshov/treplo/pkg/sber/salute"
@@ -39,7 +39,7 @@ func (t *Treplo) Run() error {
 	t.ctx = ctx
 	t.cancel = cancel
 
-	var repository mechanics.Repository
+	var repository business_logic.Repository
 	if t.config.DatabaseDSN != "" {
 		var err error
 		repository, err = db.NewRepository(t.config.DatabaseDSN)
@@ -64,9 +64,9 @@ func (t *Treplo) Run() error {
 		panic(err)
 	}
 
-	processors := pipe.NewPipe(repository, tgbotapi.GetFileDirectURL, speechService)
+	processors := pipe.NewPipe(repository, tgbotapi, speechService)
 
-	mchncs := mechanics.NewMechanics(repository, processors)
+	mchncs := business_logic.NewBusinessLogic(repository, processors)
 	processor := tg.NewProcessor(ctx, mchncs, tgbotapi)
 	runTGBot(ctx, t.wg, tgbotapi, processor)
 
