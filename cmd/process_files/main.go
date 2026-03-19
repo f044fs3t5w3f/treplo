@@ -39,9 +39,6 @@ func main() {
 		panic(err)
 	}
 	for _, file := range files {
-		if file.ID != 1 {
-			continue
-		}
 		pipe.Process(context.Background(), &file)
 	}
 }
