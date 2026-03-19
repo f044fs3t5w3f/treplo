@@ -26,6 +26,9 @@ func NewDownloader(getFileURL GetFileURLfunc) *Downloader {
 }
 
 func (d *Downloader) Process(ctx context.Context, file *models.File) error {
+	if file.Filepath != nil {
+		return nil
+	}
 	return d.Download(ctx, file)
 }
 

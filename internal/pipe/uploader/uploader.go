@@ -21,6 +21,9 @@ type FileUploader struct {
 }
 
 func (u *FileUploader) Process(ctx context.Context, file *models.File) error {
+	if file.SaluteId != nil {
+		return nil
+	}
 	saluteId, err := u.uploadFile(file)
 	if err != nil {
 		return fmt.Errorf("u.uploadFile: %w", err)

@@ -16,10 +16,9 @@ type Tasker struct {
 }
 
 func (r *Tasker) Process(ctx context.Context, file *models.File) error {
-	return r.CreateRecognizeTask(ctx, file)
-}
-
-func (r *Tasker) CreateRecognizeTask(ctx context.Context, file *models.File) error {
+	if file.RecognizeTaskID != nil {
+		return nil
+	}
 	taskId, status, err := r.Tasker.CreateRecognizeTask(*file.SaluteId)
 	if err != nil {
 		return fmt.Errorf("recognizer.CreateRecognizeTask: %w", err)

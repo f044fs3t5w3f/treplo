@@ -8,4 +8,6 @@ type File struct {
 	SaluteId        *string
 	RecognizeTaskID *string
 	RecognizeStatus *string
+	ResponseFileID  *string
+	Content         *string
 }
