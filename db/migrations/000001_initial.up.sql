@@ -5,6 +5,7 @@ CREATE TABLE files (
     chat_id BIGINT,
     message_id BIGINT,
     filepath VARCHAR(255) NULL,
+    encoding varchar(20),
     salute_id VARCHAR(36) NULL,
     recognize_task_id VARCHAR(255) NULL,
     recognize_status VARCHAR(8) NULL,

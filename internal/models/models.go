@@ -6,6 +6,7 @@ type File struct {
 	ChatID                  int64
 	MessageID               int
 	Filepath                *string
+	Encoding                string
 	SaluteId                *string
 	RecognizeTaskID         *string
 	RecognizeStatus         *string
