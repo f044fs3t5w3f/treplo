@@ -41,7 +41,6 @@ func (g *GigaChatService) GetAnswer(ctx context.Context, messages []Message) (st
 		RepetitionPenalty: 1,
 		Messages:          messages,
 	}
-	requestData.Messages = append(requestData.Messages, messages...)
 
 	buf := &bytes.Buffer{}
 	encoder := json.NewEncoder(buf)

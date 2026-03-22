@@ -11,6 +11,7 @@ import (
 	"github.com/a-kuleshov/treplo/internal/db"
 	"github.com/a-kuleshov/treplo/internal/db/sql"
 	"github.com/a-kuleshov/treplo/internal/tg"
+	"github.com/a-kuleshov/treplo/pkg/sber/gigachat"
 	"github.com/a-kuleshov/treplo/pkg/sber/salute"
 	tgBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -52,16 +53,22 @@ func (t *Treplo) Run() error {
 	if repository == nil {
 		panic("No repository")
 	}
+	speechService, err := salute.StartSpeachService(ctx, t.config.SaluteSpeechAuthorizationKey)
+	if err != nil {
+		slog.Error("salute.StartSpeachService", "error", err)
+		panic(err)
+	}
+
+	gigachatService, err := gigachat.StartGigaChatService(ctx, t.config.GigachatAuthorizationKey)
+	if err != nil {
+		slog.Error("gigachat.StartGigaChatService", "error", err)
+		panic(err)
+	}
 
 	tgbotapi, err := tgBotApi.NewBotAPI(t.config.TgToken)
 
 	if err != nil {
 		slog.Error("tgbotapi.NewBotAPI", "error", err)
-		panic(err)
-	}
-	speechService, err := salute.StartSpeachService(ctx, t.config.SaluteSpeechAuthorizationKey)
-	if err != nil {
-		slog.Error("salute.StartSpeachService", "error", err)
 		panic(err)
 	}
 
@@ -71,7 +78,7 @@ func (t *Treplo) Run() error {
 		panic(err)
 	}
 
-	mchncs := business_logic.NewBusinessLogic(repository, processors)
+	mchncs := business_logic.NewBusinessLogic(repository, processors, gigachatService)
 	processor := tg.NewProcessor(ctx, mchncs, tgbotapi)
 	runTGBot(ctx, t.wg, tgbotapi, processor)
 

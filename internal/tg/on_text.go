@@ -22,7 +22,7 @@ func (p *Processor) onText(ctx context.Context, update tgBotApi.Update) error {
 	case "find":
 		// TODO: handle find command
 	case "chat":
-		// TODO: handle chat command
+		return p.commandChat(ctx, update, payload)
 	default:
 		// TODO: handle unknown command
 	}
