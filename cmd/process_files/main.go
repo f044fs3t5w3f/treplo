@@ -5,7 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/a-kuleshov/treplo/internal/business_logic/pipe"
-	"github.com/a-kuleshov/treplo/internal/db"
+	"github.com/a-kuleshov/treplo/internal/db/sql"
 	"github.com/a-kuleshov/treplo/internal/treplo"
 	"github.com/a-kuleshov/treplo/pkg/configuration"
 	"github.com/a-kuleshov/treplo/pkg/sber/salute"
@@ -20,7 +20,7 @@ func main() {
 		panic(err)
 	}
 
-	repo, err := db.NewRepository(config.DatabaseDSN)
+	repo, err := sql.NewRepository(config.DatabaseDSN)
 	if err != nil {
 		panic(err)
 	}
@@ -42,7 +42,7 @@ func main() {
 		panic(err)
 	}
 	for _, file := range files {
-		err := pipe.Process(context.Background(), &file)
+		err := pipe.Process(context.Background(), file)
 		if err != nil {
 			slog.Error(err.Error())
 		}
