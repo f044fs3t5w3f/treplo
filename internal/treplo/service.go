@@ -39,7 +39,7 @@ func (t *Treplo) Run() error {
 	t.ctx = ctx
 	t.cancel = cancel
 
-	var repository business_logic.Repository
+	var repository db.Repository
 	if t.config.DatabaseDSN != "" {
 		var err error
 		repository, err = db.NewRepository(t.config.DatabaseDSN)
