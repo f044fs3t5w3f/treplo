@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/a-kuleshov/treplo/internal/db"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -11,6 +12,8 @@ import (
 type repository struct {
 	db *sql.DB
 }
+
+var _ db.Repository = &repository{}
 
 func NewRepository(databaseDSN string) (*repository, error) {
 	db, err := sql.Open("pgx", databaseDSN)

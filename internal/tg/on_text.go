@@ -20,11 +20,16 @@ func (p *Processor) onText(ctx context.Context, update tgBotApi.Update) error {
 	case "get":
 		return p.commandGet(ctx, update, payload)
 	case "find":
-		// TODO: handle find command
+		return p.commandFind(ctx, update, payload)
 	case "chat":
 		return p.commandChat(ctx, update, payload)
 	default:
-		// TODO: handle unknown command
+		p.replyToMessage(
+			ctx,
+			update.Message.Chat.ID,
+			update.Message.MessageID,
+			"Неизвесная команда",
+		)
 	}
 	slog.DebugContext(ctx, "onText", "command", command, "payload", payload)
 
