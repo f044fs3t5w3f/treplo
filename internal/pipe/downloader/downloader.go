@@ -11,18 +11,19 @@ import (
 	"github.com/a-kuleshov/treplo/internal/models"
 )
 
-const directory = "storage"
-
 type GetFileURLfunc func(fileID string) (string, error)
 
 type Downloader struct {
-	getFileURL GetFileURLfunc
+	getFileURL  GetFileURLfunc
+	storagePath string
 }
 
-func NewDownloader(getFileURL GetFileURLfunc) *Downloader {
+func NewDownloader(getFileURL GetFileURLfunc, storagePath string) (*Downloader, error) {
+	// TODO: create directory if not exists
 	return &Downloader{
-		getFileURL: getFileURL,
-	}
+		getFileURL:  getFileURL,
+		storagePath: storagePath,
+	}, nil
 }
 
 func (d *Downloader) Process(ctx context.Context, file *models.File) error {
@@ -48,7 +49,7 @@ func (d *Downloader) Download(ctx context.Context, file *models.File) error {
 	defer reader.Close()
 
 	filename := fmt.Sprintf("%d_%s", file.ID, file.FileID)
-	fullFilename := filepath.Join(directory, filename)
+	fullFilename := filepath.Join(d.storagePath, filename)
 
 	f, err := os.OpenFile(fullFilename, os.O_WRONLY|os.O_CREATE, 0700)
 	if err != nil {

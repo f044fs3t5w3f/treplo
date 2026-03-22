@@ -31,10 +31,14 @@ func (tn tgNotifier) Notify(replyToMessageId int, chatId int64, message string) 
 	return err
 }
 
-func NewPipe(repo repository, tgbotapi *tgBotApi.BotAPI, saluteApi *salute.SpeachService) pipe {
+func NewPipe(repo repository, tgbotapi *tgBotApi.BotAPI, saluteApi *salute.SpeachService, storagePath string) (pipe, error) {
+	downloaderProcessor, err := downloader.NewDownloader(tgbotapi.GetFileDirectURL, storagePath)
+	if err != nil {
+		return pipe{}, fmt.Errorf("downloader.NewDownloader: %w", err)
+	}
 	return pipe{
 		processors: []FileProcessor{
-			downloader.NewDownloader(tgbotapi.GetFileDirectURL),
+			downloaderProcessor,
 			&uploader.FileUploader{Uploader: saluteApi},
 			&tasker.Tasker{Tasker: saluteApi},
 			&waiter.Waiter{StatusChecker: saluteApi},
@@ -42,7 +46,7 @@ func NewPipe(repo repository, tgbotapi *tgBotApi.BotAPI, saluteApi *salute.Speac
 			&notifier.NotifyProccessor{Notifier: tgNotifier{tgbotapi: tgbotapi}},
 		},
 		repo: repo,
-	}
+	}, nil
 }
 
 func (p pipe) Process(ctx context.Context, file *models.File) error {

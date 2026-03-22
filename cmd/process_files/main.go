@@ -32,7 +32,10 @@ func main() {
 		panic(err)
 	}
 
-	pipe := pipe.NewPipe(repo, tgbotapi, speachService)
+	pipe, err := pipe.NewPipe(repo, tgbotapi, speachService, config.StoragePath)
+	if err != nil {
+		panic(err)
+	}
 
 	files, err := repo.ListFiles(context.Background())
 	if err != nil {
