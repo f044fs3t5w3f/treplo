@@ -11,8 +11,6 @@ import (
 	"github.com/google/uuid"
 )
 
-const ScopeSaluteSpeech = "SALUTE_SPEECH_PERS"
-
 func generateRqUID() string {
 	u4 := uuid.New()
 	return u4.String()

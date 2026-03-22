@@ -8,17 +8,15 @@ import (
 	"github.com/a-kuleshov/treplo/pkg/sber/token"
 )
 
-type tokenStorage interface {
-	GetToken() (string, error)
-}
+const ScopeSaluteSpeech = "SALUTE_SPEECH_PERS"
 
 type SpeachService struct {
-	tokenStorage tokenStorage
+	tokenStorage token.TokenGetter
 	wg           *sync.WaitGroup
 }
 
 func StartSpeachService(ctx context.Context, clientSecret string) (*SpeachService, error) {
-	tokenStorage, err := token.NewStorage(ctx, clientSecret, token.ScopeSaluteSpeech)
+	tokenStorage, err := token.NewStorage(ctx, clientSecret, ScopeSaluteSpeech)
 	if err != nil {
 		return nil, fmt.Errorf("token.NewStorage: %w", err)
 	}
