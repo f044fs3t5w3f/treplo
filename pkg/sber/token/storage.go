@@ -10,13 +10,15 @@ import (
 )
 
 var ErrNotReady = errors.New("token is not ready")
+var ErrWasStoped = errors.New("token getter was stopped")
 
-const delayMargin = 1790 * time.Second
+const delayMargin = 1700 * time.Second
 
 type Storage struct {
 	token        string
 	lock         *sync.RWMutex
 	clientSecret string
+	wasStoped    bool
 }
 
 func NewStorage(ctx context.Context, clientSecret string, scope string) (*Storage, error) {
@@ -39,6 +41,10 @@ func NewStorage(ctx context.Context, clientSecret string, scope string) (*Storag
 			select {
 			case <-ctx.Done():
 				slog.Info("Salute speach token service is shutting down")
+				timer.Stop()
+				storage.lock.Lock()
+				storage.wasStoped = true
+				storage.lock.Unlock()
 				return
 			case <-timer.C:
 				slog.Info("Get new token")
@@ -55,6 +61,9 @@ func NewStorage(ctx context.Context, clientSecret string, scope string) (*Storag
 
 func (s *Storage) GetToken() (string, error) {
 	s.lock.RLock()
+	if s.wasStoped {
+		return "", ErrWasStoped
+	}
 	defer s.lock.RUnlock()
 	return s.token, nil
 }

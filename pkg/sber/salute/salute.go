@@ -28,4 +28,5 @@ func StartSpeachService(ctx context.Context, clientSecret string) (*SpeachServic
 }
 
 func (s *SpeachService) Stop() {
+	s.wg.Wait()
 }
