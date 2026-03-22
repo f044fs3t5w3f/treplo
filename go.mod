@@ -4,7 +4,6 @@ go 1.26.1
 
 require (
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
-	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang-migrate/migrate/v4 v4.19.1
 	github.com/stretchr/testify v1.11.1
 )
@@ -18,7 +17,6 @@ require (
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	golang.org/x/sync v0.18.0 // indirect
 	golang.org/x/text v0.31.0 // indirect
-	gopkg.in/telebot.v3 v3.3.8 // indirect
 )
 
 require (
