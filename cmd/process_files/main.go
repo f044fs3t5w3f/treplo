@@ -4,8 +4,8 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/a-kuleshov/treplo/internal/business_logic/pipe"
 	"github.com/a-kuleshov/treplo/internal/db"
-	"github.com/a-kuleshov/treplo/internal/pipe"
 	"github.com/a-kuleshov/treplo/internal/treplo"
 	"github.com/a-kuleshov/treplo/pkg/configuration"
 	"github.com/a-kuleshov/treplo/pkg/sber/salute"

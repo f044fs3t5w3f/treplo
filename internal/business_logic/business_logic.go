@@ -1,7 +1,7 @@
 package business_logic
 
 import (
-	"github.com/a-kuleshov/treplo/internal/pipe"
+	"github.com/a-kuleshov/treplo/internal/business_logic/pipe"
 )
 
 type BusinessLogic struct {

@@ -7,8 +7,8 @@ import (
 	"sync"
 
 	"github.com/a-kuleshov/treplo/internal/business_logic"
+	"github.com/a-kuleshov/treplo/internal/business_logic/pipe"
 	"github.com/a-kuleshov/treplo/internal/db"
-	"github.com/a-kuleshov/treplo/internal/pipe"
 	"github.com/a-kuleshov/treplo/internal/tg"
 	"github.com/a-kuleshov/treplo/pkg/sber/salute"
 	tgBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
