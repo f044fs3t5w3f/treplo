@@ -12,7 +12,6 @@ func (p *Processor) onText(ctx context.Context, update tgBotApi.Update) error {
 	message := update.Message
 	command, payload := extractCommandAndPayload(message.Text)
 	switch command {
-	// list, get, find, chat
 	case "start":
 		return p.commandStart(ctx, update)
 	case "list":
@@ -42,7 +41,7 @@ func extractCommandAndPayload(text string) (string, string) {
 	}
 
 	parts := strings.SplitN(text[1:], " ", 2)
-	command := parts[0]
+	command := strings.ToLower(parts[0])
 	var payload string
 	if len(parts) > 1 {
 		payload = strings.TrimSpace(parts[1])
