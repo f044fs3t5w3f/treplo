@@ -9,6 +9,7 @@ import (
 	"github.com/a-kuleshov/treplo/internal/business_logic"
 	"github.com/a-kuleshov/treplo/internal/business_logic/pipe"
 	"github.com/a-kuleshov/treplo/internal/db"
+	"github.com/a-kuleshov/treplo/internal/db/sql"
 	"github.com/a-kuleshov/treplo/internal/tg"
 	"github.com/a-kuleshov/treplo/pkg/sber/salute"
 	tgBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -42,7 +43,7 @@ func (t *Treplo) Run() error {
 	var repository db.Repository
 	if t.config.DatabaseDSN != "" {
 		var err error
-		repository, err = db.NewRepository(t.config.DatabaseDSN)
+		repository, err = sql.NewRepository(t.config.DatabaseDSN)
 		if err != nil {
 			slog.Error("Failed to create repository", "error", err)
 			panic(err)

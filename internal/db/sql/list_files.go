@@ -1,4 +1,4 @@
-package db
+package sql
 
 import (
 	"context"
@@ -7,13 +7,10 @@ import (
 	"github.com/a-kuleshov/treplo/internal/models"
 )
 
-func (r *repository) ListFilesByChatID(ctx context.Context, chatID int64) ([]models.File, error) {
+func (r *repository) ListFiles(ctx context.Context) ([]models.File, error) {
 	rows, err := r.db.QueryContext(ctx, `
-		SELECT id, chat_id, message_id, file_id, filepath, salute_id,recognize_task_id, recognize_status, response_file_id, dialogue_content, process_notification_sent, encoding
-		FROM files
-		WHERE chat_id = $1
-		ORDER by id 
-	`, chatID)
+		SELECT id, chat_id, message_id, file_id, filepath, salute_id,recognize_task_id, recognize_status, response_file_id, dialogue_content, process_notification_sent, encoding FROM files
+	`)
 	if err != nil {
 		return nil, err
 	}
