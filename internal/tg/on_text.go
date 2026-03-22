@@ -18,7 +18,7 @@ func (p *Processor) onText(ctx context.Context, update tgBotApi.Update) error {
 	case "list":
 		return p.commandList(ctx, update)
 	case "get":
-		// TODO: handle get command
+		return p.commandGet(ctx, update, payload)
 	case "find":
 		// TODO: handle find command
 	case "chat":

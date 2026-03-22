@@ -9,4 +9,5 @@ import (
 type Repository interface {
 	SaveFile(ctx context.Context, file *models.File) error
 	ListFilesByChatID(ctx context.Context, chatID int64) ([]models.File, error)
+	GetFileByID(ctx context.Context, fileID int64) (*models.File, error)
 }
