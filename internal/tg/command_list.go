@@ -18,6 +18,7 @@ func (p *Processor) commandList(ctx context.Context, update tgBotApi.Update) err
 			update.Message.MessageID,
 			"Произошла ошибка, попробуйте позже",
 		)
+		return fmt.Errorf("businessLogic.ListAudio: %w", err)
 	}
 	if len(files) == 0 {
 		p.replyToMessage(
@@ -26,7 +27,7 @@ func (p *Processor) commandList(ctx context.Context, update tgBotApi.Update) err
 			update.Message.MessageID,
 			"Пока ничего нет",
 		)
-
+		return nil
 	}
 	textParts := make([]string, 0, len(files))
 	for _, file := range files {

@@ -9,11 +9,12 @@ import (
 
 func (bl *BusinessLogic) OnAudio(ctx context.Context, chatID int64, messageId int, fileID string) error {
 	// TODO: detect encoding
+	encoding := VoiceAudioEncoding
 	file := models.File{
 		FileID:    fileID,
 		ChatID:    chatID,
 		MessageID: messageId,
-		Encoding:  VoiceAudioEncoding,
+		Encoding:  &encoding,
 	}
 	err := bl.repo.SaveFile(ctx, &file)
 	if err != nil {

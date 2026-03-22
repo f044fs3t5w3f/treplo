@@ -12,7 +12,7 @@ import (
 
 func (r *repository) GetFileByID(ctx context.Context, fileID int64) (*models.File, error) {
 	row := r.db.QueryRowContext(ctx, `
-		SELECT id, chat_id, message_id, file_id, filepath, salute_id,recognize_task_id, recognize_status, response_file_id, dialogue_content, process_notification_sent 
+		SELECT id, chat_id, message_id, file_id, filepath, salute_id,recognize_task_id, recognize_status, response_file_id, dialogue_content, process_notification_sent, encoding 
 		FROM files
 		WHERE id = $1
 	`, fileID)
@@ -23,7 +23,7 @@ func (r *repository) GetFileByID(ctx context.Context, fileID int64) (*models.Fil
 	}
 
 	file := models.File{}
-	if err := row.Scan(&file.ID, &file.ChatID, &file.MessageID, &file.FileID, &file.Filepath, &file.SaluteId, &file.RecognizeTaskID, &file.RecognizeStatus, &file.ResponseFileID, &file.Content, &file.ProcessNotificationSent); err != nil {
+	if err := row.Scan(&file.ID, &file.ChatID, &file.MessageID, &file.FileID, &file.Filepath, &file.SaluteId, &file.RecognizeTaskID, &file.RecognizeStatus, &file.ResponseFileID, &file.Content, &file.ProcessNotificationSent, &file.Encoding); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}
