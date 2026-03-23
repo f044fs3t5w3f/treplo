@@ -20,17 +20,6 @@ type pipe struct {
 	repo       repository
 }
 
-type tgNotifier struct {
-	tgbotapi *tgBotApi.BotAPI
-}
-
-func (tn tgNotifier) Notify(replyToMessageId int, chatId int64, message string) error {
-	tgMessage := tgBotApi.NewMessage(chatId, message)
-	tgMessage.ReplyToMessageID = replyToMessageId
-	_, err := tn.tgbotapi.Send(tgMessage)
-	return err
-}
-
 func NewPipe(repo repository, tgbotapi *tgBotApi.BotAPI, saluteApi *salute.SpeachService, storagePath string) (pipe, error) {
 	downloaderProcessor, err := downloader.NewDownloader(tgbotapi.GetFileDirectURL, storagePath)
 	if err != nil {
