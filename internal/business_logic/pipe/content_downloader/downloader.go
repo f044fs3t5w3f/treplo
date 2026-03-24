@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/a-kuleshov/treplo/internal/business_logic/pipe/errors"
 	"github.com/a-kuleshov/treplo/internal/models"
 )
 
@@ -20,7 +21,7 @@ func (r *Tasker) Process(ctx context.Context, file *models.File) error {
 		return nil
 	}
 	if file.ResponseFileID == nil {
-		return fmt.Errorf("file.ResponseFileId is nil")
+		return fmt.Errorf("%w: ResponseFileID", errors.ErrNoField)
 	}
 	content, err := r.Downloader.DownloadContent(*file.ResponseFileID)
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/a-kuleshov/treplo/internal/business_logic/pipe/errors"
 	"github.com/a-kuleshov/treplo/internal/models"
 )
 
@@ -23,8 +24,8 @@ const statusError = "ERROR"
 const statusCanceled = "CANCELED"
 
 func (w *Waiter) Process(ctx context.Context, file *models.File) error {
-	if file.RecognizeTaskID == nil {
-		return fmt.Errorf("RecognizeTaskID is nil")
+	if file.SaluteId == nil {
+		return fmt.Errorf("%w: SaluteId", errors.ErrNoField)
 	}
 	attempts := 3
 	for {

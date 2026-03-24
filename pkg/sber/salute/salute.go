@@ -15,6 +15,8 @@ type SpeachService struct {
 	wg           *sync.WaitGroup
 }
 
+// TODO: reuse client intead of creating a new one for every request
+
 func StartSpeachService(ctx context.Context, clientSecret string) (*SpeachService, error) {
 	tokenStorage, err := token.NewStorage(ctx, clientSecret, ScopeSaluteSpeech)
 	if err != nil {

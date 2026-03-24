@@ -34,9 +34,6 @@ func (d *Downloader) Process(ctx context.Context, file *models.File) error {
 }
 
 func (d *Downloader) Download(ctx context.Context, file *models.File) error {
-	if file.Filepath != nil {
-		return nil
-	}
 	url, err := d.getFileURL(file.FileID)
 	if err != nil {
 		return err
