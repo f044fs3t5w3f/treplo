@@ -16,7 +16,7 @@ type responseApiUploadFile struct {
 	} `json:"result"`
 }
 
-func (s *SpeachService) UploadFile(ctx context.Context, file io.Reader) (string, error) {
+func (s *SpeechService) UploadFile(ctx context.Context, file io.Reader) (string, error) {
 	token, err := s.tokenStorage.GetToken()
 	if err != nil {
 		return "", fmt.Errorf("tokenStorage.GetToken: %w", err)
@@ -49,7 +49,7 @@ func (s *SpeachService) UploadFile(ctx context.Context, file io.Reader) (string,
 		if err != nil {
 			return "", fmt.Errorf("io.ReadAll: %w", err)
 		}
-		return "", fmt.Errorf("salute speach request failded: %s, %s", res.Status, string(body))
+		return "", fmt.Errorf("salute speech request failed: %s, %s", res.Status, string(body))
 	}
 	var response responseApiUploadFile
 	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {

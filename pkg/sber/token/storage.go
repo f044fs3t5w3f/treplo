@@ -40,7 +40,7 @@ func NewStorage(ctx context.Context, clientSecret string, scope string) (*Storag
 			timer := time.NewTimer(delta - delayMargin)
 			select {
 			case <-ctx.Done():
-				slog.Info("Salute speach token service is shutting down")
+				slog.Info("Salute speech token service is shutting down")
 				timer.Stop()
 				storage.lock.Lock()
 				storage.wasStoped = true

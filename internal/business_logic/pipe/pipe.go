@@ -31,7 +31,7 @@ type pipe struct {
 	ch chan *models.File
 }
 
-func NewPipe(ctx context.Context, repo repository, tgbotapi *tgBotApi.BotAPI, saluteApi *salute.SpeachService, storagePath string) (pipe, error) {
+func NewPipe(ctx context.Context, repo repository, tgbotapi *tgBotApi.BotAPI, saluteApi *salute.SpeechService, storagePath string) (pipe, error) {
 	downloaderProcessor, err := downloader.NewDownloader(tgbotapi.GetFileDirectURL, storagePath)
 	if err != nil {
 		return pipe{}, fmt.Errorf("downloader.NewDownloader: %w", err)

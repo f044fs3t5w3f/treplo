@@ -47,7 +47,7 @@ type responseApiCreateRecognizeTask struct {
 	} `json:"result"`
 }
 
-func (s *SpeachService) CreateRecognizeTask(ctx context.Context, saluteFileId string, encoding string) (string, string, error) {
+func (s *SpeechService) CreateRecognizeTask(ctx context.Context, saluteFileId string, encoding string) (string, string, error) {
 	token, err := s.tokenStorage.GetToken()
 	if err != nil {
 		return "", "", fmt.Errorf("tokenStorage.GetToken: %w", err)
@@ -85,7 +85,7 @@ func (s *SpeachService) CreateRecognizeTask(ctx context.Context, saluteFileId st
 		if err != nil {
 			return "", "", fmt.Errorf("io.ReadAll: %w", err)
 		}
-		return "", "", fmt.Errorf("salute speach request failded: %s, %s", res.Status, string(body))
+		return "", "", fmt.Errorf("salute speech request failed: %s, %s", res.Status, string(body))
 	}
 	var response responseApiCreateRecognizeTask
 	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {

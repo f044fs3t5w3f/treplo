@@ -10,25 +10,25 @@ import (
 
 const ScopeSaluteSpeech = "SALUTE_SPEECH_PERS"
 
-type SpeachService struct {
+type SpeechService struct {
 	tokenStorage token.TokenGetter
 	wg           *sync.WaitGroup
 }
 
 // TODO: reuse client intead of creating a new one for every request
 
-func StartSpeachService(ctx context.Context, clientSecret string) (*SpeachService, error) {
+func StartSpeechService(ctx context.Context, clientSecret string) (*SpeechService, error) {
 	tokenStorage, err := token.NewStorage(ctx, clientSecret, ScopeSaluteSpeech)
 	if err != nil {
 		return nil, fmt.Errorf("token.NewStorage: %w", err)
 	}
-	service := SpeachService{
+	service := SpeechService{
 		tokenStorage: tokenStorage,
 		wg:           &sync.WaitGroup{},
 	}
 	return &service, nil
 }
 
-func (s *SpeachService) Stop() {
+func (s *SpeechService) Stop() {
 	s.wg.Wait()
 }

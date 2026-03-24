@@ -20,7 +20,7 @@ type responseApiCheckStatus struct {
 	} `json:"result"`
 }
 
-func (s *SpeachService) CheckStatus(ctx context.Context, saluteTaskId string) (string, string, error) {
+func (s *SpeechService) CheckStatus(ctx context.Context, saluteTaskId string) (string, string, error) {
 	token, err := s.tokenStorage.GetToken()
 	if err != nil {
 		return "", "", fmt.Errorf("tokenStorage.GetToken: %w", err)
@@ -51,7 +51,7 @@ func (s *SpeachService) CheckStatus(ctx context.Context, saluteTaskId string) (s
 		if err != nil {
 			return "", "", fmt.Errorf("io.ReadAll: %w", err)
 		}
-		return "", "", fmt.Errorf("salute speach request failded: %s, %s", res.Status, string(body))
+		return "", "", fmt.Errorf("salute speech request failed: %s, %s", res.Status, string(body))
 	}
 
 	var response responseApiCheckStatus

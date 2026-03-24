@@ -48,7 +48,7 @@ type responseApiDownloadContent []struct {
 	} `json:"person_identity"`
 }
 
-func (s *SpeachService) DownloadContent(ctx context.Context, saluteFileId string) (string, error) {
+func (s *SpeechService) DownloadContent(ctx context.Context, saluteFileId string) (string, error) {
 	token, err := s.tokenStorage.GetToken()
 	if err != nil {
 		return "", fmt.Errorf("tokenStorage.GetToken: %w", err)
@@ -79,7 +79,7 @@ func (s *SpeachService) DownloadContent(ctx context.Context, saluteFileId string
 		if err != nil {
 			return "", fmt.Errorf("io.ReadAll: %w", err)
 		}
-		return "", fmt.Errorf("salute speach request failded: %s, %s", res.Status, string(body))
+		return "", fmt.Errorf("salute speech request failed: %s, %s", res.Status, string(body))
 	}
 	var response responseApiDownloadContent
 	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {

@@ -15,7 +15,7 @@ import (
 func main() {
 	var config treplo.Config
 	configuration.ScanConfig(&config, nil)
-	speachService, err := salute.StartSpeachService(context.Background(), config.SaluteSpeechAuthorizationKey)
+	speechService, err := salute.StartSpeechService(context.Background(), config.SaluteSpeechAuthorizationKey)
 	if err != nil {
 		panic(err)
 	}
@@ -32,7 +32,7 @@ func main() {
 		panic(err)
 	}
 
-	pipe, err := pipe.NewPipe(context.TODO(), repo, tgbotapi, speachService, config.StoragePath)
+	pipe, err := pipe.NewPipe(context.TODO(), repo, tgbotapi, speechService, config.StoragePath)
 	if err != nil {
 		panic(err)
 	}

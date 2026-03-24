@@ -20,7 +20,7 @@ type Stopable interface {
 	Stop()
 }
 
-// Treplo struct is the main service of the application that manage all the subservices: database, telegram bot handeler, salute speach and gigachat
+// Treplo struct is the main service of the application that manage all the subservices: database, telegram bot handeler, salute speech and gigachat
 type Treplo struct {
 	wg       *sync.WaitGroup
 	config   Config
@@ -52,9 +52,9 @@ func (t *Treplo) Run() error {
 	if repository == nil {
 		panic("No repository")
 	}
-	speechService, err := salute.StartSpeachService(ctx, t.config.SaluteSpeechAuthorizationKey)
+	speechService, err := salute.StartSpeechService(ctx, t.config.SaluteSpeechAuthorizationKey)
 	if err != nil {
-		slog.Error("salute.StartSpeachService", "error", err)
+		slog.Error("salute.StartSpeechService", "error", err)
 		panic(err)
 	}
 
