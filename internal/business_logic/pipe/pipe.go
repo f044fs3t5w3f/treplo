@@ -18,9 +18,16 @@ import (
 
 const bufSize = 10
 
+// pipe is the struct containg proccessors of audiofiles.
+// It includes the following steps:
+// - download file from telegram
+// - TODO: findout the encoding
+// - upload file to Salute speech service
+// - create task for speech recognition
+// - wait untill task is finished
+// - download content of audio
+// - send notification
 type pipe struct {
-	// processors []FileProcessor
-	// repo       repository
 	ch chan *models.File
 }
 
