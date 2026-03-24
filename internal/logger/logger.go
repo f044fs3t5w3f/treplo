@@ -10,6 +10,7 @@ type loggerKeyType struct{}
 var loggerKey = loggerKeyType{}
 
 func GetLogger() *slog.Logger {
+	// TODO: make own logger
 	logger := slog.Default()
 	return logger
 }
