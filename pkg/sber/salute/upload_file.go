@@ -1,6 +1,7 @@
 package salute
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -14,7 +15,7 @@ type responseApiUploadFile struct {
 	} `json:"result"`
 }
 
-func (s *SpeachService) UploadFile(file io.Reader) (string, error) {
+func (s *SpeachService) UploadFile(ctx context.Context, file io.Reader) (string, error) {
 	token, err := s.tokenStorage.GetToken()
 	if err != nil {
 		return "", fmt.Errorf("tokenStorage.GetToken: %w", err)
@@ -24,10 +25,10 @@ func (s *SpeachService) UploadFile(file io.Reader) (string, error) {
 	method := http.MethodPost
 
 	client := &http.Client{}
-	req, err := http.NewRequest(method, url, file)
+	req, err := http.NewRequestWithContext(ctx, method, url, file)
 
 	if err != nil {
-		return "", fmt.Errorf("http.NewRequest: %w", err)
+		return "", fmt.Errorf("http.NewRequestWithContext: %w", err)
 	}
 	req.Header.Add("Content-Type", "audio/mpeg")
 	req.Header.Add("Accept", "application/json")

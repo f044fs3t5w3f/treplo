@@ -9,7 +9,7 @@ import (
 )
 
 type Downloader interface {
-	DownloadContent(saluteFileId string) (string, error)
+	DownloadContent(ctx context.Context, saluteFileId string) (string, error)
 }
 
 type Tasker struct {
@@ -23,7 +23,7 @@ func (r *Tasker) Process(ctx context.Context, file *models.File) error {
 	if file.ResponseFileID == nil {
 		return fmt.Errorf("%w: ResponseFileID", errors.ErrNoField)
 	}
-	content, err := r.Downloader.DownloadContent(*file.ResponseFileID)
+	content, err := r.Downloader.DownloadContent(ctx, *file.ResponseFileID)
 	if err != nil {
 		return fmt.Errorf("Downloader.DownloadContent: %w", err)
 	}

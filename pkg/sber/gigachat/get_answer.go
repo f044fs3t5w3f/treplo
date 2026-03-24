@@ -49,9 +49,9 @@ func (g *GigaChatService) GetAnswer(ctx context.Context, messages []Message) (st
 		return "", fmt.Errorf("encoder.Encode: %w ", err)
 	}
 
-	request, err := http.NewRequest(http.MethodPost, url, buf)
+	request, err := http.NewRequestWithContext(ctx, http.MethodPost, url, buf)
 	if err != nil {
-		return "", fmt.Errorf("http.NewRequest: %w ", err)
+		return "", fmt.Errorf("http.NewRequestWithContext: %w ", err)
 	}
 	// uuid := generateRqUID()
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")

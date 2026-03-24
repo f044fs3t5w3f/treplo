@@ -10,7 +10,7 @@ import (
 )
 
 type statusChecker interface {
-	CheckStatus(saluteTaskId string) (string, string, error)
+	CheckStatus(ctx context.Context, saluteTaskId string) (string, string, error)
 }
 
 type Waiter struct {
@@ -29,7 +29,7 @@ func (w *Waiter) Process(ctx context.Context, file *models.File) error {
 	}
 	attempts := 3
 	for {
-		status, responseFileId, err := w.StatusChecker.CheckStatus(*file.RecognizeTaskID)
+		status, responseFileId, err := w.StatusChecker.CheckStatus(ctx, *file.RecognizeTaskID)
 		if err != nil {
 			attempts = attempts - 1
 			if attempts == 0 {

@@ -14,7 +14,7 @@ import (
 const directory = "storage"
 
 type Uploader interface {
-	UploadFile(file io.Reader) (string, error)
+	UploadFile(ctx context.Context, file io.Reader) (string, error)
 }
 
 type FileUploader struct {
@@ -25,7 +25,7 @@ func (u *FileUploader) Process(ctx context.Context, file *models.File) error {
 	if file.SaluteId != nil {
 		return nil
 	}
-	saluteId, err := u.uploadFile(file)
+	saluteId, err := u.uploadFile(ctx, file)
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func (u *FileUploader) Process(ctx context.Context, file *models.File) error {
 	return nil
 }
 
-func (u *FileUploader) uploadFile(file *models.File) (string, error) {
+func (u *FileUploader) uploadFile(ctx context.Context, file *models.File) (string, error) {
 	if file.Filepath == nil {
 		return "", fmt.Errorf("%w: Filepath", errors.ErrNoField)
 	}
@@ -43,7 +43,7 @@ func (u *FileUploader) uploadFile(file *models.File) (string, error) {
 		return "", err
 	}
 	defer f.Close()
-	fileId, err := u.Uploader.UploadFile(f)
+	fileId, err := u.Uploader.UploadFile(ctx, f)
 	if err != nil {
 		return "", fmt.Errorf("uploader.UploadFile: %w", err)
 	}

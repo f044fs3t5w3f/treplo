@@ -10,7 +10,7 @@ import (
 )
 
 type SpeechTasker interface {
-	CreateRecognizeTask(saluteFileId string, encoding string) (string, string, error)
+	CreateRecognizeTask(ctx context.Context, saluteFileId string, encoding string) (string, string, error)
 }
 
 type Tasker struct {
@@ -29,7 +29,7 @@ func (r *Tasker) Process(ctx context.Context, file *models.File) error {
 	if file.Encoding == nil {
 		return fmt.Errorf("%w: Encoding", errors.ErrNoField)
 	}
-	taskId, status, err := r.Tasker.CreateRecognizeTask(*file.SaluteId, *file.Encoding)
+	taskId, status, err := r.Tasker.CreateRecognizeTask(ctx, *file.SaluteId, *file.Encoding)
 	if err != nil {
 		return fmt.Errorf("recognizer.CreateRecognizeTask: %w", err)
 	}
