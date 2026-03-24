@@ -20,9 +20,9 @@ type Stopable interface {
 	Stop()
 }
 
+// Treplo struct is the main service of the application that manage all the subservices: database, telegram bot handeler, salute speach and gigachat
 type Treplo struct {
 	wg       *sync.WaitGroup
-	ctx      context.Context
 	config   Config
 	cancel   func()
 	services []Stopable
@@ -38,7 +38,6 @@ func NewService(config Config) (*Treplo, error) {
 
 func (t *Treplo) Run() error {
 	ctx, cancel := context.WithCancel(context.Background())
-	t.ctx = ctx
 	t.cancel = cancel
 
 	var repository db.Repository

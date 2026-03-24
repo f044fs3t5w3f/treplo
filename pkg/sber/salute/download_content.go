@@ -52,6 +52,8 @@ func (s *SpeachService) DownloadContent(ctx context.Context, saluteFileId string
 	if err != nil {
 		return "", fmt.Errorf("tokenStorage.GetToken: %w", err)
 	}
+	s.wg.Add(1)
+	defer s.wg.Done()
 
 	url := "https://smartspeech.sber.ru/rest/v1/data:download?response_file_id=" + saluteFileId
 

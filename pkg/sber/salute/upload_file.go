@@ -20,6 +20,8 @@ func (s *SpeachService) UploadFile(ctx context.Context, file io.Reader) (string,
 	if err != nil {
 		return "", fmt.Errorf("tokenStorage.GetToken: %w", err)
 	}
+	s.wg.Add(1)
+	defer s.wg.Done()
 
 	url := "https://smartspeech.sber.ru/rest/v1/data:upload"
 	method := http.MethodPost

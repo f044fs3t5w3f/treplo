@@ -51,6 +51,8 @@ func (s *SpeachService) CreateRecognizeTask(ctx context.Context, saluteFileId st
 	if err != nil {
 		return "", "", fmt.Errorf("tokenStorage.GetToken: %w", err)
 	}
+	s.wg.Add(1)
+	defer s.wg.Done()
 
 	url := "https://smartspeech.sber.ru/rest/v1/speech:async_recognize"
 	method := http.MethodPost

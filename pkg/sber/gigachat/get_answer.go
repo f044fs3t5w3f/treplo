@@ -23,6 +23,8 @@ type responseApicompletions struct {
 }
 
 func (g *GigaChatService) GetAnswer(ctx context.Context, messages []Message) (string, error) {
+	g.wg.Add(1)
+	defer g.wg.Done()
 	url := "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
 	client := &http.Client{}
 	token, err := g.tokenStorage.GetToken()

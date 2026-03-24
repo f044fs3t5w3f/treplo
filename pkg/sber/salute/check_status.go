@@ -24,6 +24,8 @@ func (s *SpeachService) CheckStatus(ctx context.Context, saluteTaskId string) (s
 	if err != nil {
 		return "", "", fmt.Errorf("tokenStorage.GetToken: %w", err)
 	}
+	s.wg.Add(1)
+	defer s.wg.Done()
 
 	url := "https://smartspeech.sber.ru/rest/v1/task:get?id=" + saluteTaskId
 
