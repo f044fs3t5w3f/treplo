@@ -2,9 +2,9 @@ package tg
 
 import (
 	"context"
-	"log/slog"
 	"strings"
 
+	"github.com/a-kuleshov/treplo/internal/logger"
 	tgBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -30,7 +30,7 @@ func (p *Processor) onText(ctx context.Context, update tgBotApi.Update) error {
 			"Неизвесная команда",
 		)
 	}
-	slog.DebugContext(ctx, "onText", "command", command, "payload", payload)
+	logger.FromContext(ctx).Debug("onText", "command", command, "payload", payload)
 
 	return nil
 }

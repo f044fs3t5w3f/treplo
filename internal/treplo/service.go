@@ -2,14 +2,13 @@ package treplo
 
 import (
 	"context"
-	"fmt"
-	"log/slog"
 	"sync"
 
 	"github.com/a-kuleshov/treplo/internal/business_logic"
 	"github.com/a-kuleshov/treplo/internal/business_logic/pipe"
 	"github.com/a-kuleshov/treplo/internal/db"
 	"github.com/a-kuleshov/treplo/internal/db/sql"
+	"github.com/a-kuleshov/treplo/internal/logger"
 	"github.com/a-kuleshov/treplo/internal/tg"
 	"github.com/a-kuleshov/treplo/pkg/sber/gigachat"
 	"github.com/a-kuleshov/treplo/pkg/sber/salute"
@@ -45,7 +44,7 @@ func (t *Treplo) Run() error {
 		var err error
 		repository, err = sql.NewRepository(t.config.DatabaseDSN)
 		if err != nil {
-			slog.Error("Failed to create repository", "error", err)
+			logger.FromContext(ctx).Error("Failed to create repository", "error", err)
 			panic(err)
 		}
 	}
@@ -54,20 +53,20 @@ func (t *Treplo) Run() error {
 	}
 	speechService, err := salute.StartSpeechService(ctx, t.config.SaluteSpeechAuthorizationKey)
 	if err != nil {
-		slog.Error("salute.StartSpeechService", "error", err)
+		logger.FromContext(ctx).Error("salute.StartSpeechService", "error", err)
 		panic(err)
 	}
 
 	gigachatService, err := gigachat.StartGigaChatService(ctx, t.config.GigachatAuthorizationKey)
 	if err != nil {
-		slog.Error("gigachat.StartGigaChatService", "error", err)
+		logger.FromContext(ctx).Error("gigachat.StartGigaChatService", "error", err)
 		panic(err)
 	}
 
 	tgbotapi, err := tgBotApi.NewBotAPI(t.config.TgToken)
 
 	if err != nil {
-		slog.Error("tgbotapi.NewBotAPI", "error", err)
+		logger.FromContext(ctx).Error("tgbotapi.NewBotAPI", "error", err)
 		panic(err)
 	}
 
@@ -75,7 +74,7 @@ func (t *Treplo) Run() error {
 	fileProcessingPipe, err := pipe.NewPipe(ctx, repository, tgbotapi, speechService, t.config.StoragePath)
 
 	if err != nil {
-		slog.Error("pipe.NewPipe", "error", err)
+		logger.FromContext(ctx).Error("pipe.NewPipe", "error", err)
 		panic(err)
 	}
 
@@ -104,13 +103,12 @@ func runTGBot(ctx context.Context, wg *sync.WaitGroup, tgbotapi *tgBotApi.BotAPI
 		for {
 			select {
 			case <-ctx.Done():
-				slog.Info("Stop get tg updates")
+				logger.FromContext(ctx).Info("Stop get tg updates")
 				return
 			case update := <-updates:
-				fmt.Println("in")
 				processor.Process(ctx, update)
 			}
 		}
 	})
-	slog.Info("runTGBot done")
+	logger.FromContext(ctx).Info("runTGBot done")
 }
