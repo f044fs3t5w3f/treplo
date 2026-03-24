@@ -2,7 +2,9 @@ package treplo
 
 import (
 	"context"
+	"os"
 	"sync"
+	"time"
 
 	"github.com/a-kuleshov/treplo/internal/business_logic"
 	"github.com/a-kuleshov/treplo/internal/business_logic/pipe"
@@ -86,13 +88,14 @@ func (t *Treplo) Run() error {
 	return nil
 }
 
-func (t *Treplo) Stop() error {
+func (t *Treplo) Stop() {
 	t.cancel()
+	timer := time.AfterFunc(3*time.Second, func() { os.Exit(130) })
+	defer timer.Stop()
 	for _, service := range t.services {
 		service.Stop()
 	}
 	t.wg.Wait()
-	return nil
 }
 
 func runTGBot(ctx context.Context, wg *sync.WaitGroup, tgbotapi *tgBotApi.BotAPI, processor *tg.Processor) {
