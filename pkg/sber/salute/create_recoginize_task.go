@@ -45,7 +45,7 @@ type responseApiCreateRecognizeTask struct {
 	} `json:"result"`
 }
 
-func (s *SpeachService) CreateRecognizeTask(saluteFileId string) (string, string, error) {
+func (s *SpeachService) CreateRecognizeTask(saluteFileId string, encoding string) (string, string, error) {
 	token, err := s.tokenStorage.GetToken()
 	if err != nil {
 		return "", "", fmt.Errorf("tokenStorage.GetToken: %w", err)
@@ -54,7 +54,6 @@ func (s *SpeachService) CreateRecognizeTask(saluteFileId string) (string, string
 	url := "https://smartspeech.sber.ru/rest/v1/speech:async_recognize"
 	method := http.MethodPost
 
-	encoding := VoiceAudioEncoding
 	payload := strings.NewReader(
 		fmt.Sprintf(createRecognizeTaskPayloadTemplate, encoding, saluteFileId),
 	)

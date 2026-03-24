@@ -53,7 +53,12 @@ func NewPipe(ctx context.Context, repo repository, tgbotapi *tgBotApi.BotAPI, sa
 		}
 		go func() {
 			for file := range inputChannel {
-				processor.Process(ctx, file)
+				err := processor.Process(ctx, file)
+				if err != nil {
+					logger.FromContext(ctx).Error("File processing error", "fileID", file.ID)
+					tgNotifier.Notify(file.MessageID, file.ChatID, "В процессе обработки аудио произошла ошибка")
+					continue
+				}
 				if err := repo.SaveFile(ctx, file); err != nil {
 					logger.FromContext(ctx).Error("pipe: repo.SaveFile", "error", err.Error())
 					tgNotifier.Notify(file.MessageID, file.ChatID, "В процессе обработки аудио произошла ошибка")
