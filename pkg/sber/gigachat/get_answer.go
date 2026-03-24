@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 type Message struct {
@@ -26,7 +27,8 @@ func (g *GigaChatService) GetAnswer(ctx context.Context, messages []Message) (st
 	g.wg.Add(1)
 	defer g.wg.Done()
 	url := "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
-	client := &http.Client{}
+	client := &http.Client{Timeout: 10 * time.Second}
+	// TODO: use client in struct instead of creating the new one
 	token, err := g.tokenStorage.GetToken()
 	if err != nil {
 		return "", fmt.Errorf("tokenStorage.GetToken: %w", err)

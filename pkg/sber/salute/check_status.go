@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 type responseApiCheckStatus struct {
@@ -29,7 +30,8 @@ func (s *SpeachService) CheckStatus(ctx context.Context, saluteTaskId string) (s
 
 	url := "https://smartspeech.sber.ru/rest/v1/task:get?id=" + saluteTaskId
 
-	client := &http.Client{}
+	client := &http.Client{Timeout: 10 * time.Second}
+	// TODO: use client in struct instead of creating the new one
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 type responseApiUploadFile struct {
@@ -26,7 +27,8 @@ func (s *SpeachService) UploadFile(ctx context.Context, file io.Reader) (string,
 	url := "https://smartspeech.sber.ru/rest/v1/data:upload"
 	method := http.MethodPost
 
-	client := &http.Client{}
+	client := &http.Client{Timeout: 10 * time.Second}
+	// TODO: use client in struct instead of creating the new one
 	req, err := http.NewRequestWithContext(ctx, method, url, file)
 
 	if err != nil {

@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
 )
 
 const VoiceAudioEncoding = "OPUS"
@@ -61,7 +62,8 @@ func (s *SpeachService) CreateRecognizeTask(ctx context.Context, saluteFileId st
 		fmt.Sprintf(createRecognizeTaskPayloadTemplate, encoding, saluteFileId),
 	)
 
-	client := &http.Client{}
+	client := &http.Client{Timeout: 10 * time.Second}
+	// TODO: use client in struct instead of creating the new one
 	req, err := http.NewRequestWithContext(ctx, method, url, payload)
 
 	if err != nil {

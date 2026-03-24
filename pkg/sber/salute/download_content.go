@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type responseApiDownloadContent []struct {
@@ -57,7 +58,8 @@ func (s *SpeachService) DownloadContent(ctx context.Context, saluteFileId string
 
 	url := "https://smartspeech.sber.ru/rest/v1/data:download?response_file_id=" + saluteFileId
 
-	client := &http.Client{}
+	client := &http.Client{Timeout: 10 * time.Second}
+	// TODO: use client in struct instead of creating the new one
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 
 	if err != nil {
