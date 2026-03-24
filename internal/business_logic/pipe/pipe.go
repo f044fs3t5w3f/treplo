@@ -29,13 +29,15 @@ func NewPipe(ctx context.Context, repo repository, tgbotapi *tgBotApi.BotAPI, sa
 	if err != nil {
 		return pipe{}, fmt.Errorf("downloader.NewDownloader: %w", err)
 	}
+	// TODO: make pools of processors instead of single one
+	tgNotifier := tgNotifier{tgbotapi: tgbotapi}
 	processors := []FileProcessor{
 		downloaderProcessor,
 		&uploader.FileUploader{Uploader: saluteApi},
 		&tasker.Tasker{Tasker: saluteApi},
 		&waiter.Waiter{StatusChecker: saluteApi},
 		&content_downloader.Tasker{Downloader: saluteApi},
-		&notifier.NotifyProccessor{Notifier: tgNotifier{tgbotapi: tgbotapi}},
+		&notifier.NotifyProccessor{Notifier: tgNotifier},
 	}
 	channels := make([]chan *models.File, len(processors))
 
@@ -53,7 +55,8 @@ func NewPipe(ctx context.Context, repo repository, tgbotapi *tgBotApi.BotAPI, sa
 			for file := range inputChannel {
 				processor.Process(ctx, file)
 				if err := repo.SaveFile(ctx, file); err != nil {
-					logger.FromContext(ctx).Error("pipe: repo.SaveFile: %w", err)
+					logger.FromContext(ctx).Error("pipe: repo.SaveFile", "error", err.Error())
+					tgNotifier.Notify(file.MessageID, file.ChatID, "В процессе обработки аудио произошла ошибка")
 					continue
 				}
 				if outputChannel != nil {
@@ -70,4 +73,6 @@ func NewPipe(ctx context.Context, repo repository, tgbotapi *tgBotApi.BotAPI, sa
 
 func (p pipe) Process(ctx context.Context, file *models.File) error {
 	p.ch <- file
+	return nil // to implement processor interface
+
 }

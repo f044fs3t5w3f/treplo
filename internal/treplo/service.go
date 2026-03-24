@@ -72,7 +72,7 @@ func (t *Treplo) Run() error {
 		panic(err)
 	}
 
-	processors, err := pipe.NewPipe(repository, tgbotapi, speechService, t.config.StoragePath)
+	processors, err := pipe.NewPipe(ctx, repository, tgbotapi, speechService, t.config.StoragePath)
 	if err != nil {
 		slog.Error("pipe.NewPipe", "error", err)
 		panic(err)
