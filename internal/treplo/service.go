@@ -72,8 +72,9 @@ func (t *Treplo) Run() error {
 		panic(err)
 	}
 
-	fileProcessingPipe, err := pipe.NewPipe(repository, tgbotapi, speechService, t.config.StoragePath)
 	// TODO: run add unprocessed files to queue
+	fileProcessingPipe, err := pipe.NewPipe(ctx, repository, tgbotapi, speechService, t.config.StoragePath)
+
 	if err != nil {
 		slog.Error("pipe.NewPipe", "error", err)
 		panic(err)
@@ -83,11 +84,7 @@ func (t *Treplo) Run() error {
 	processor := tg.NewProcessor(ctx, business_login, tgbotapi)
 	runTGBot(ctx, t.wg, tgbotapi, processor)
 
-	// saluteSpeachService, err := salute.StartSpeachService(ctx, t.config.SaluteSpeechAuthorizationKey)
-	// if err != nil {
-	// 	return err
-	// }
-	// t.services = append(t.services, saluteSpeachService)
+	t.services = append(t.services, speechService, gigachatService)
 	return nil
 }
 

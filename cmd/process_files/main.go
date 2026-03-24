@@ -32,7 +32,7 @@ func main() {
 		panic(err)
 	}
 
-	pipe, err := pipe.NewPipe(repo, tgbotapi, speachService, config.StoragePath)
+	pipe, err := pipe.NewPipe(context.TODO(), repo, tgbotapi, speachService, config.StoragePath)
 	if err != nil {
 		panic(err)
 	}
