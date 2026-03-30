@@ -5,8 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"sync"
 	"time"
+
+	"github.com/a-kuleshov/treplo/pkg/sber/client"
 )
 
 var ErrNotReady = errors.New("token is not ready")
@@ -19,6 +22,7 @@ type Storage struct {
 	lock         *sync.RWMutex
 	clientSecret string
 	wasStoped    bool
+	client       client.Client
 }
 
 func NewStorage(ctx context.Context, clientSecret string, scope string) (*Storage, error) {
@@ -31,6 +35,7 @@ func NewStorage(ctx context.Context, clientSecret string, scope string) (*Storag
 		lock:         &sync.RWMutex{},
 		clientSecret: clientSecret,
 		token:        token,
+		client:       http.DefaultClient,
 	}
 
 	delta := time.Duration(time.Until(expiresAt))
