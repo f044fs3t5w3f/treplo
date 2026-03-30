@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/a-kuleshov/treplo/pkg/sber/gigachat"
 )
@@ -17,8 +18,7 @@ func (bl *BusinessLogic) AskAboutAudios(ctx context.Context, chatID int64, quest
 	}
 	texts := make([]string, len(audios)*2)
 	for i, audio := range audios {
-		texts[i*2] = "Содержимое аудио:"
-		// TODO: добавить дату
+		texts[i*2] = "Содержимое аудио: от " + audio.CreatedAt.Format(time.DateTime)
 		if audio.Content != nil {
 			texts[i*2+1] = *audio.Content
 			// TODO: не выбирать не готовые аудио

@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type File struct {
 	ID                      int64
 	FileID                  string
@@ -13,4 +15,5 @@ type File struct {
 	ResponseFileID          *string
 	Content                 *string
 	ProcessNotificationSent bool
+	CreatedAt               time.Time
 }
