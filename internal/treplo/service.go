@@ -2,6 +2,7 @@ package treplo
 
 import (
 	"context"
+	"errors"
 	"os"
 	"sync"
 	"time"
@@ -29,12 +30,12 @@ type Treplo struct {
 	services []Stopable
 }
 
-func NewService(config Config) (*Treplo, error) {
+func NewService(config Config) *Treplo {
 	service := &Treplo{
 		wg:     &sync.WaitGroup{},
 		config: config,
 	}
-	return service, nil
+	return service
 }
 
 func (t *Treplo) Run() error {
@@ -47,29 +48,30 @@ func (t *Treplo) Run() error {
 		repository, err = sql.NewRepository(t.config.DatabaseDSN)
 		if err != nil {
 			logger.FromContext(ctx).Error("Failed to create repository", "error", err)
-			panic(err)
+			return err
 		}
 	}
 	if repository == nil {
-		panic("No repository")
+		logger.FromContext(ctx).Error("No repository")
+		return errors.New("no repository")
 	}
 	speechService, err := salute.StartSpeechService(ctx, t.config.SaluteSpeechAuthorizationKey)
 	if err != nil {
 		logger.FromContext(ctx).Error("salute.StartSpeechService", "error", err)
-		panic(err)
+		return err
 	}
 
 	gigachatService, err := gigachat.StartGigaChatService(ctx, t.config.GigachatAuthorizationKey)
 	if err != nil {
 		logger.FromContext(ctx).Error("gigachat.StartGigaChatService", "error", err)
-		panic(err)
+		return err
 	}
 
 	tgbotapi, err := tgBotApi.NewBotAPI(t.config.TgToken)
 
 	if err != nil {
 		logger.FromContext(ctx).Error("tgbotapi.NewBotAPI", "error", err)
-		panic(err)
+		return err
 	}
 
 	// TODO: run add unprocessed files to queue
@@ -77,7 +79,7 @@ func (t *Treplo) Run() error {
 
 	if err != nil {
 		logger.FromContext(ctx).Error("pipe.NewPipe", "error", err)
-		panic(err)
+		return err
 	}
 
 	business_login := business_logic.NewBusinessLogic(repository, fileProcessingPipe, gigachatService)
