@@ -61,9 +61,9 @@ func NewStorage(ctx context.Context, clientSecret string, scope string) (*Storag
 
 func (s *Storage) GetToken() (string, error) {
 	s.lock.RLock()
+	defer s.lock.RUnlock()
 	if s.wasStoped {
 		return "", ErrWasStoped
 	}
-	defer s.lock.RUnlock()
 	return s.token, nil
 }
