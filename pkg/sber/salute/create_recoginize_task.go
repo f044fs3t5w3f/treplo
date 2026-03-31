@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
 )
 
 const VoiceAudioEncoding = "OPUS"
@@ -61,6 +62,8 @@ func (s *SpeechService) CreateRecognizeTask(ctx context.Context, saluteFileId st
 		fmt.Sprintf(createRecognizeTaskPayloadTemplate, encoding, saluteFileId),
 	)
 
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, method, url, payload)
 
 	if err != nil {

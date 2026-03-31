@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 type responseApiUploadFile struct {
@@ -26,6 +27,8 @@ func (s *SpeechService) UploadFile(ctx context.Context, file io.Reader) (string,
 	url := "https://smartspeech.sber.ru/rest/v1/data:upload"
 	method := http.MethodPost
 
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Minute)
+	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, method, url, file)
 
 	if err != nil {

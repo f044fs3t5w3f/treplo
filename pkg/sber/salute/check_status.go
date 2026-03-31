@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 type responseApiCheckStatus struct {
@@ -28,7 +29,8 @@ func (s *SpeechService) CheckStatus(ctx context.Context, saluteTaskId string) (s
 	defer s.wg.Done()
 
 	url := "https://smartspeech.sber.ru/rest/v1/task:get?id=" + saluteTaskId
-
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 
 	if err != nil {

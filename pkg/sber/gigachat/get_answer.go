@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 type Message struct {
@@ -50,6 +51,8 @@ func (g *GigaChatService) GetAnswer(ctx context.Context, messages []Message) (st
 		return "", fmt.Errorf("encoder.Encode: %w ", err)
 	}
 
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
 	request, err := http.NewRequestWithContext(ctx, http.MethodPost, url, buf)
 	if err != nil {
 		return "", fmt.Errorf("http.NewRequestWithContext: %w ", err)

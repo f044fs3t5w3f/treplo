@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type responseApiDownloadContent []struct {
@@ -57,6 +58,8 @@ func (s *SpeechService) DownloadContent(ctx context.Context, saluteFileId string
 
 	url := "https://smartspeech.sber.ru/rest/v1/data:download?response_file_id=" + saluteFileId
 
+	ctx, cancel := context.WithTimeout(ctx, 3*time.Minute)
+	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 
 	if err != nil {
