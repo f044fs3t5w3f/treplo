@@ -2,6 +2,7 @@ package tg
 
 import (
 	"context"
+	"time"
 
 	"github.com/a-kuleshov/treplo/internal/business_logic"
 	tgBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -21,6 +22,8 @@ func NewProcessor(ctx context.Context, service *business_logic.BusinessLogic, tg
 }
 
 func (p *Processor) Process(ctx context.Context, update tgBotApi.Update) error {
+	ctx, cancel := context.WithTimeout(ctx, 20*time.Second)
+	defer cancel()
 	p.saveUser(ctx, update)
 	message := update.Message
 	if message == nil {
