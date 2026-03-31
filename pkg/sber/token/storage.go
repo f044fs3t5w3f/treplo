@@ -9,7 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/a-kuleshov/treplo/pkg/sber/client"
+	"github.com/a-kuleshov/treplo/pkg/client"
+	"golang.org/x/time/rate"
 )
 
 var ErrNotReady = errors.New("token is not ready")
@@ -30,12 +31,16 @@ func NewStorage(ctx context.Context, clientSecret string, scope string) (*Storag
 	if err != nil {
 		return nil, fmt.Errorf("initial getAccessToken: %w", err)
 	}
-
+	client := client.NewClient(
+		client.WithLimiter(rate.NewLimiter(1, 1), 2*time.Second),
+		client.WithRetries(1*time.Second, 2*time.Second, 3*time.Second),
+		client.WithClient(&http.Client{Timeout: 10 * time.Second}),
+	)
 	storage := Storage{
 		lock:         &sync.RWMutex{},
 		clientSecret: clientSecret,
 		token:        token,
-		client:       http.DefaultClient,
+		client:       client,
 	}
 
 	delta := time.Duration(time.Until(expiresAt))

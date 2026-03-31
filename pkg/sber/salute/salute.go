@@ -7,8 +7,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/a-kuleshov/treplo/pkg/sber/client"
+	"github.com/a-kuleshov/treplo/pkg/client"
 	"github.com/a-kuleshov/treplo/pkg/sber/token"
+	"golang.org/x/time/rate"
 )
 
 const ScopeSaluteSpeech = "SALUTE_SPEECH_PERS"
@@ -24,8 +25,12 @@ func StartSpeechService(ctx context.Context, clientSecret string) (*SpeechServic
 	if err != nil {
 		return nil, fmt.Errorf("token.NewStorage: %w", err)
 	}
-	// TODO: add ratelimit
-	client := &http.Client{Timeout: 10 * time.Second}
+
+	client := client.NewClient(
+		client.WithLimiter(rate.NewLimiter(100, 100), 2*time.Second),
+		client.WithRetries(1*time.Second, 2*time.Second, 3*time.Second),
+		client.WithClient(&http.Client{Timeout: 10 * time.Second}),
+	)
 	service := SpeechService{
 		tokenStorage: tokenStorage,
 		wg:           &sync.WaitGroup{},
