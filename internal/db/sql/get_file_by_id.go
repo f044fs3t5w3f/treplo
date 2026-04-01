@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/a-kuleshov/treplo/internal/logger"
 	"github.com/a-kuleshov/treplo/internal/models"
 )
 
@@ -19,7 +18,6 @@ func (r *repository) GetFileByID(ctx context.Context, fileID int64) (*models.Fil
 	row := r.db.QueryRowContext(ctx, query, fileID)
 
 	if err := row.Err(); err != nil {
-		logger.FromContext(ctx).Error("GetFileByID", "error", err.Error())
 		return nil, fmt.Errorf("db.QueryRowContext: %w", err)
 	}
 
@@ -28,7 +26,6 @@ func (r *repository) GetFileByID(ctx context.Context, fileID int64) (*models.Fil
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}
-		logger.FromContext(ctx).Error("GetFileByID", "error", err.Error())
 		return nil, fmt.Errorf("rows.Scan: %w", err)
 	}
 	return &file, nil

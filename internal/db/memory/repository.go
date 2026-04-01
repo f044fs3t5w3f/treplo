@@ -10,12 +10,14 @@ import (
 
 // MemoryRepository implements [db.Repository]. Only for testing purposes.
 type MemoryRepository struct {
+	users     []*models.User
 	files     []*models.File
 	currentID atomic.Int64
 }
 
 func NewMemoryRepository() *MemoryRepository {
 	return &MemoryRepository{
+		users:     []*models.User{},
 		files:     []*models.File{},
 		currentID: atomic.Int64{},
 	}

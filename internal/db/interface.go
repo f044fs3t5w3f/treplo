@@ -12,4 +12,5 @@ type Repository interface {
 	ListFilesByChatIDAndKeywords(ctx context.Context, keywords []string, chatID int64) ([]*models.File, error)
 	GetFileByID(ctx context.Context, fileID int64) (*models.File, error)
 	ListNewFiles(ctx context.Context) ([]*models.File, error)
+	SaveUser(ctx context.Context, user *models.User) error
 }
