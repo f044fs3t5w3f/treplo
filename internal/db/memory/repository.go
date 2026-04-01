@@ -41,14 +41,18 @@ func (m *MemoryRepository) ListFiles(ctx context.Context) ([]*models.File, error
 }
 
 // ListFilesByChatID implements [db.Repository].
-func (m *MemoryRepository) ListFilesByChatID(ctx context.Context, chatID int64) ([]*models.File, error) {
-	files := make([]*models.File, 0)
+func (m *MemoryRepository) ListFilesByChatID(ctx context.Context, chatID int64, page int, limit int) ([]*models.File, bool, error) {
+	files := make([]*models.File, 0, limit)
+
 	for _, f := range m.files {
 		if f.ChatID == chatID {
+			if len(files) == limit {
+				return files, true, nil
+			}
 			files = append(files, deepCopyFile(f))
 		}
 	}
-	return files, nil
+	return files, false, nil
 }
 
 // SaveFile implements [db.Repository].

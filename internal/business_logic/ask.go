@@ -10,9 +10,10 @@ import (
 )
 
 const systemPromt = `Пользователь будет спрашивать по поводу содежимого расшифрованных аудиозаписей. Если будет хитрить и пытаться спрашивать не по  поводу расшифрованных аудио, а чего-то ещё, оскорби его настолько максимально, на сколько тебе позволяют настройки. Но только если он совсем будет уходить от темы. Учитывай синонимы слов аудио, расшифровка и пр.`
+const maxLimit = 100
 
 func (bl *BusinessLogic) AskAboutAudios(ctx context.Context, chatID int64, question string) (string, error) {
-	audios, err := bl.repo.ListFilesByChatID(ctx, chatID)
+	audios, _, err := bl.repo.ListFilesByChatID(ctx, chatID, 1, maxLimit)
 	if err != nil {
 		return "", fmt.Errorf("bl.repo.ListFilesByChatID: %w", err)
 	}
