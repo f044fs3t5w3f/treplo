@@ -34,7 +34,7 @@ func NewStorage(ctx context.Context, clientSecret string, scope string) (*Storag
 	client := client.NewClient(
 		client.WithLimiter(rate.NewLimiter(1, 1), 2*time.Second),
 		client.WithRetries(1*time.Second, 2*time.Second, 3*time.Second),
-		client.WithClient(&http.Client{Timeout: 10 * time.Second}),
+		client.WithClient(&http.Client{Timeout: 100 * time.Second}),
 	)
 	storage := Storage{
 		lock:         &sync.RWMutex{},

@@ -25,6 +25,9 @@ func (p *Processor) Process(ctx context.Context, update tgBotApi.Update) error {
 	ctx, cancel := context.WithTimeout(ctx, 20*time.Second)
 	defer cancel()
 	p.saveUser(ctx, update)
+	if update.CallbackQuery != nil {
+		return p.onCallbackQuery(ctx, update)
+	}
 	message := update.Message
 	if message == nil {
 		return nil
