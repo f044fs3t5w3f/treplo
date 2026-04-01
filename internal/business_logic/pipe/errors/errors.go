@@ -5,7 +5,6 @@ import (
 )
 
 var ErrNoField = errors.New("required fields is missing")
-var ErrUnsupportedEncoding = newErrorForUser("unsupported encoding", "Неподдерживаемая кодировка файла")
 
 // FileProcessingError is an error that contains information about file and message that we can send to the owner of it
 type FileProcessingError struct {
@@ -13,7 +12,7 @@ type FileProcessingError struct {
 	UserMessage string
 }
 
-func newErrorForUser(s string, userMessage string) FileProcessingError {
+func NewErrorForUser(s string, userMessage string) FileProcessingError {
 	return FileProcessingError{
 		error:       errors.New(s),
 		UserMessage: userMessage,

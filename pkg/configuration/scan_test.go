@@ -3,10 +3,10 @@ package configuration
 import (
 	"os"
 	"path/filepath"
-	"runtime"
 	"testing"
 	"time"
 
+	"github.com/a-kuleshov/treplo/pkg/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -126,11 +126,6 @@ func TestScanConfig_duration(t *testing.T) {
 }
 
 func getTestJSONFilePath() string {
-	_, filename, _, ok := runtime.Caller(0)
-	if !ok {
-		panic("Failed to retrieve caller information")
-	}
-
-	dir := filepath.Dir(filename)
+	dir := utils.GetPackageDirecory()
 	return filepath.Join(dir, "./test_config.json")
 }

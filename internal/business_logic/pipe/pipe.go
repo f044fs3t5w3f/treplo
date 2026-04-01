@@ -6,6 +6,7 @@ import (
 
 	"github.com/a-kuleshov/treplo/internal/business_logic/pipe/content_downloader"
 	"github.com/a-kuleshov/treplo/internal/business_logic/pipe/downloader"
+	"github.com/a-kuleshov/treplo/internal/business_logic/pipe/encoding_detector"
 	"github.com/a-kuleshov/treplo/internal/business_logic/pipe/notifier"
 	"github.com/a-kuleshov/treplo/internal/business_logic/pipe/tasker"
 	"github.com/a-kuleshov/treplo/internal/business_logic/pipe/uploader"
@@ -13,6 +14,7 @@ import (
 	"github.com/a-kuleshov/treplo/internal/logger"
 	"github.com/a-kuleshov/treplo/internal/models"
 	"github.com/a-kuleshov/treplo/pkg/sber/salute"
+	"github.com/a-kuleshov/treplo/pkg/utils"
 	tgBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"golang.org/x/sync/semaphore"
 )
@@ -34,6 +36,10 @@ type pipe struct {
 }
 
 func NewPipe(ctx context.Context, repo repository, tgbotapi *tgBotApi.BotAPI, saluteApi *salute.SpeechService, storagePath string) (pipe, error) {
+	err := utils.IsDirectoryExistsAndWrible(storagePath)
+	if err != nil {
+		return pipe{}, fmt.Errorf("utils.IsDirectoryExistsAndWrible: %w, path %s", err, storagePath)
+	}
 	downloaderProcessor, err := downloader.NewDownloader(tgbotapi.GetFileDirectURL, storagePath)
 	if err != nil {
 		return pipe{}, fmt.Errorf("downloader.NewDownloader: %w", err)
@@ -42,7 +48,8 @@ func NewPipe(ctx context.Context, repo repository, tgbotapi *tgBotApi.BotAPI, sa
 
 	processors := []FileProcessor{
 		downloaderProcessor,
-		&uploader.FileUploader{Uploader: saluteApi},
+		&encoding_detector.EncodingDetector{StoragePath: storagePath},
+		&uploader.FileUploader{Uploader: saluteApi, StoragePath: storagePath},
 		&tasker.Tasker{Tasker: saluteApi},
 		&waiter.Waiter{StatusChecker: saluteApi},
 		&content_downloader.Tasker{Downloader: saluteApi},

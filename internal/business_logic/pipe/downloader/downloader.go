@@ -19,7 +19,6 @@ type Downloader struct {
 }
 
 func NewDownloader(getFileURL GetFileURLfunc, storagePath string) (*Downloader, error) {
-	// TODO: create directory if not exists
 	return &Downloader{
 		getFileURL:  getFileURL,
 		storagePath: storagePath,
