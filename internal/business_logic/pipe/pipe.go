@@ -14,9 +14,11 @@ import (
 	"github.com/a-kuleshov/treplo/internal/models"
 	"github.com/a-kuleshov/treplo/pkg/sber/salute"
 	tgBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"golang.org/x/sync/semaphore"
 )
 
 const bufSize = 10
+const maxOperations = 5
 
 // pipe is the struct containg proccessors of audiofiles.
 // It includes the following steps:
@@ -36,8 +38,8 @@ func NewPipe(ctx context.Context, repo repository, tgbotapi *tgBotApi.BotAPI, sa
 	if err != nil {
 		return pipe{}, fmt.Errorf("downloader.NewDownloader: %w", err)
 	}
-	// TODO: make pools of processors instead of single one
 	tgNotifier := tgNotifier{tgbotapi: tgbotapi}
+
 	processors := []FileProcessor{
 		downloaderProcessor,
 		&uploader.FileUploader{Uploader: saluteApi},
@@ -46,8 +48,9 @@ func NewPipe(ctx context.Context, repo repository, tgbotapi *tgBotApi.BotAPI, sa
 		&content_downloader.Tasker{Downloader: saluteApi},
 		&notifier.NotifyProccessor{Notifier: tgNotifier},
 	}
-	channels := make([]chan *models.File, len(processors))
 
+	channels := make([]chan *models.File, len(processors))
+	errorChannel := runErrorHandler(tgNotifier)
 	for i := range channels {
 		channels[i] = make(chan *models.File, bufSize)
 	}
@@ -58,22 +61,27 @@ func NewPipe(ctx context.Context, repo repository, tgbotapi *tgBotApi.BotAPI, sa
 		if i < len(channels)-1 {
 			outputChannel = channels[i+1]
 		}
+		processorSemaphore := semaphore.NewWeighted(maxOperations)
 		go func() {
 			for file := range inputChannel {
-				err := processor.Process(ctx, file)
-				if err != nil {
-					logger.FromContext(ctx).Error("File processing error", "fileID", file.ID)
-					tgNotifier.Notify(file.MessageID, file.ChatID, "В процессе обработки аудио произошла ошибка")
-					continue
-				}
-				if err := repo.SaveFile(ctx, file); err != nil {
-					logger.FromContext(ctx).Error("pipe: repo.SaveFile", "error", err.Error())
-					tgNotifier.Notify(file.MessageID, file.ChatID, "В процессе обработки аудио произошла ошибка")
-					continue
-				}
-				if outputChannel != nil {
-					outputChannel <- file
-				}
+				processorSemaphore.Acquire(ctx, 1)
+				go func() {
+					defer processorSemaphore.Release(1)
+					err := processor.Process(ctx, file)
+					if err != nil {
+						logger.FromContext(ctx).Error("File processing error", "fileID", file.ID)
+						errorChannel <- file
+						return
+					}
+					if err := repo.SaveFile(ctx, file); err != nil {
+						logger.FromContext(ctx).Error("pipe: repo.SaveFile", "error", err.Error())
+						errorChannel <- file
+						return
+					}
+					if outputChannel != nil {
+						outputChannel <- file
+					}
+				}()
 			}
 		}()
 	}
@@ -86,5 +94,14 @@ func NewPipe(ctx context.Context, repo repository, tgbotapi *tgBotApi.BotAPI, sa
 func (p pipe) Process(ctx context.Context, file *models.File) error {
 	p.ch <- file
 	return nil // to implement processor interface
+}
 
+func runErrorHandler(tgNotifier tgNotifier) (errorChannel chan<- *models.File) {
+	channel := make(chan *models.File, bufSize)
+	go func() {
+		for file := range channel {
+			tgNotifier.Notify(file.MessageID, file.ChatID, "В процессе обработки аудио произошла ошибка")
+		}
+	}()
+	return channel
 }
