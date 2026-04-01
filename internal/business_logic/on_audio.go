@@ -8,7 +8,6 @@ import (
 )
 
 func (bl *BusinessLogic) OnAudio(ctx context.Context, chatID int64, messageId int, fileID string) error {
-	// TODO: detect encoding
 	file := models.File{
 		FileID:    fileID,
 		ChatID:    chatID,
