@@ -22,7 +22,6 @@ type result struct {
 }
 
 func (bl *BusinessLogic) FindFiles(ctx context.Context, words string, chatID int64) ([]result, error) {
-	// TODO: make inline keyboard
 	keyWords := splitText(words)
 	if len(keyWords) == 0 {
 		return nil, ErrNoFiles
