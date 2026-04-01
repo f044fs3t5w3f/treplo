@@ -39,9 +39,9 @@ func (r *repository) ListFilesByChatIDAndKeywords(ctx context.Context, keywords 
 
 func getConditionsAndArgs(keywords []string, chatID int64) (string, []any) {
 	args := make([]any, len(keywords)+2)
-
 	conditions := make([]string, len(keywords)+2)
-	conditions[0] = "chat_id = $1 and status = $2"
+	conditions[0] = "chat_id = $1"
+	conditions[1] = "status = $2"
 	args[0] = chatID
 	args[1] = models.FileStatusDone
 
@@ -49,7 +49,7 @@ func getConditionsAndArgs(keywords []string, chatID int64) (string, []any) {
 		escapingKeyword := strings.ReplaceAll(keyword, `%`, `\%`)
 		escapingKeyword = strings.ReplaceAll(escapingKeyword, `_`, `\_`)
 		args[i+2] = "%" + escapingKeyword + "%"
-		conditions[i+2] = fmt.Sprintf("dialogue_content ILIKE $%d", i+2)
+		conditions[i+2] = fmt.Sprintf("dialogue_content ILIKE $%d", i+3)
 	}
 	return strings.Join(conditions, " AND "), args
 }

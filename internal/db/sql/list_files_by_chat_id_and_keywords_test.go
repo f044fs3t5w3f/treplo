@@ -18,22 +18,22 @@ func TestGetConditionsAndArgs(t *testing.T) {
 			"no words",
 			[]string{},
 			1,
-			"chat_id = $1",
-			[]any{int64(1)},
+			"chat_id = $1 AND status = $2",
+			[]any{int64(1), "DONE"},
 		},
 		{
 			"with words",
 			[]string{"word1", "word2"},
 			1,
-			"chat_id = $1 AND dialogue_content ILIKE $2 AND dialogue_content ILIKE $3",
-			[]any{int64(1), "%word1%", "%word2%"},
+			"chat_id = $1 AND status = $2 AND dialogue_content ILIKE $3 AND dialogue_content ILIKE $4",
+			[]any{int64(1), "DONE", "%word1%", "%word2%"},
 		},
 		{
 			"escaping",
 			[]string{"wo_%rd"},
 			1,
-			"chat_id = $1 AND dialogue_content ILIKE $2",
-			[]any{int64(1), `%wo\_\%rd%`},
+			"chat_id = $1 AND status = $2 AND dialogue_content ILIKE $3",
+			[]any{int64(1), "DONE", `%wo\_\%rd%`},
 		}}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
