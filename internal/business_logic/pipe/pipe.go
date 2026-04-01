@@ -50,7 +50,7 @@ func NewPipe(ctx context.Context, repo repository, tgbotapi *tgBotApi.BotAPI, sa
 	}
 
 	channels := make([]chan *models.File, len(processors))
-	errorChannel := runErrorHandler(tgNotifier)
+	errorChannel := runErrorHandler(ctx, tgNotifier)
 	for i := range channels {
 		channels[i] = make(chan *models.File, bufSize)
 	}
@@ -70,12 +70,12 @@ func NewPipe(ctx context.Context, repo repository, tgbotapi *tgBotApi.BotAPI, sa
 					err := processor.Process(ctx, file)
 					if err != nil {
 						logger.FromContext(ctx).Error("File processing error", "fileID", file.ID)
-						errorChannel <- file
+						errorChannel <- errorContainer{err, file}
 						return
 					}
 					if err := repo.SaveFile(ctx, file); err != nil {
 						logger.FromContext(ctx).Error("pipe: repo.SaveFile", "error", err.Error())
-						errorChannel <- file
+						errorChannel <- errorContainer{err, file}
 						return
 					}
 					if outputChannel != nil {
@@ -94,14 +94,4 @@ func NewPipe(ctx context.Context, repo repository, tgbotapi *tgBotApi.BotAPI, sa
 func (p pipe) Process(ctx context.Context, file *models.File) error {
 	p.ch <- file
 	return nil // to implement processor interface
-}
-
-func runErrorHandler(tgNotifier tgNotifier) (errorChannel chan<- *models.File) {
-	channel := make(chan *models.File, bufSize)
-	go func() {
-		for file := range channel {
-			tgNotifier.Notify(file.MessageID, file.ChatID, "В процессе обработки аудио произошла ошибка")
-		}
-	}()
-	return channel
 }
