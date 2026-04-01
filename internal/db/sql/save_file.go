@@ -34,9 +34,10 @@ func (r *repository) SaveFile(ctx context.Context, file *models.File) error {
 				response_file_id = $6,
 				dialogue_content = $7,
 				process_notification_sent = $8,
-				encoding = $9
-			WHERE id = $10`,
-			file.FileID, file.Filepath, file.SaluteId, file.RecognizeTaskID, file.RecognizeStatus, file.ResponseFileID, file.Content, file.ProcessNotificationSent, file.Encoding,
+				encoding = $9,
+				status = $10
+			WHERE id = $11`,
+			file.FileID, file.Filepath, file.SaluteId, file.RecognizeTaskID, file.RecognizeStatus, file.ResponseFileID, file.Content, file.ProcessNotificationSent, file.Encoding, file.Status,
 			file.ID)
 		if err != nil {
 			return fmt.Errorf("db.ExecContext: %w", err)

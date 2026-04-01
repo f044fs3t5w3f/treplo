@@ -32,10 +32,13 @@ func (m *MemoryRepository) GetFileByID(ctx context.Context, fileID int64) (*mode
 }
 
 // ListFiles implements [db.Repository].
-func (m *MemoryRepository) ListFiles(ctx context.Context) ([]*models.File, error) {
-	files := make([]*models.File, len(m.files))
-	for i, f := range m.files {
-		files[i] = deepCopyFile(f)
+func (m *MemoryRepository) ListNewFiles(ctx context.Context) ([]*models.File, error) {
+	files := make([]*models.File, 0)
+	for _, f := range m.files {
+		if f.Status != models.FileStatusNew {
+			continue
+		}
+		files = append(files, deepCopyFile(f))
 	}
 	return files, nil
 }

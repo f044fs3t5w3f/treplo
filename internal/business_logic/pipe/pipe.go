@@ -25,7 +25,7 @@ const maxOperations = 5
 // pipe is the struct containg proccessors of audiofiles.
 // It includes the following steps:
 // - download file from telegram
-// - TODO: findout the encoding
+// - findout the encoding
 // - upload file to Salute speech service
 // - create task for speech recognition
 // - wait untill task is finished
@@ -74,18 +74,17 @@ func NewPipe(ctx context.Context, repo repository, tgbotapi *tgBotApi.BotAPI, sa
 				processorSemaphore.Acquire(ctx, 1)
 				go func() {
 					defer processorSemaphore.Release(1)
-					err := processor.Process(ctx, file)
+					processErr := processor.Process(ctx, file)
 					if err != nil {
 						logger.FromContext(ctx).Error("File processing error", "fileID", file.ID)
-						errorChannel <- errorContainer{err, file}
-						return
+						errorChannel <- errorContainer{processErr, file}
 					}
 					if err := repo.SaveFile(ctx, file); err != nil {
 						logger.FromContext(ctx).Error("pipe: repo.SaveFile", "error", err.Error())
 						errorChannel <- errorContainer{err, file}
 						return
 					}
-					if outputChannel != nil {
+					if outputChannel != nil && processErr == nil {
 						outputChannel <- file
 					}
 				}()

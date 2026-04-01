@@ -23,17 +23,22 @@ func (ed EncodingDetector) Process(ctx context.Context, file *models.File) error
 	if file.Filepath == nil {
 		return fmt.Errorf("%w: Filepath", pipeErrors.ErrNoField)
 	}
+	if file.Encoding != nil {
+		return nil
+	}
 	fullFilename := filepath.Join(ed.StoragePath, *file.Filepath)
 	fileToRecogize, err := os.Open(fullFilename)
 	if err != nil {
 		if os.IsNotExist(err) {
 			logger.FromContext(ctx).Warn("file doesn't exists", "filePath", *file.Filepath)
 		}
+		file.Status = models.FileStatusError
 		return fmt.Errorf("os.Open: %w", err)
 	}
 	defer fileToRecogize.Close()
 	encoding, err := detectEncoding(fileToRecogize)
 	if err != nil {
+		file.Status = models.FileStatusError
 		return fmt.Errorf("detectEncoding: %w", err)
 	}
 	file.Encoding = &encoding

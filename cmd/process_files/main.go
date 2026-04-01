@@ -37,7 +37,7 @@ func main() {
 		panic(err)
 	}
 
-	files, err := repo.ListFiles(context.Background())
+	files, err := repo.ListNewFiles(context.Background())
 	if err != nil {
 		panic(err)
 	}

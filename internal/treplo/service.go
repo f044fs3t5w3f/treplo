@@ -68,19 +68,18 @@ func (t *Treplo) Run() error {
 	}
 
 	tgbotapi, err := tgBotApi.NewBotAPI(t.config.TgToken)
-
 	if err != nil {
 		logger.FromContext(ctx).Error("tgbotapi.NewBotAPI", "error", err)
 		return err
 	}
 
-	// TODO: run add unprocessed files to queue
 	fileProcessingPipe, err := pipe.NewPipe(ctx, repository, tgbotapi, speechService, t.config.StoragePath)
-
 	if err != nil {
 		logger.FromContext(ctx).Error("pipe.NewPipe", "error", err)
 		return err
 	}
+
+	go runUnprocessedFilesProcessing(ctx, repository, fileProcessingPipe)
 
 	business_login := business_logic.NewBusinessLogic(repository, fileProcessingPipe, gigachatService)
 	processor := tg.NewProcessor(ctx, business_login, tgbotapi)
@@ -116,4 +115,21 @@ func runTGBot(ctx context.Context, wg *sync.WaitGroup, tgbotapi *tgBotApi.BotAPI
 		}
 	})
 	logger.FromContext(ctx).Info("runTGBot done")
+}
+
+func runUnprocessedFilesProcessing(ctx context.Context, repository db.Repository, fileProcessingPipe pipe.FileProcessor) {
+	unprocessedFiles, err := repository.ListNewFiles(ctx)
+	if err == nil {
+		for _, file := range unprocessedFiles {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
+			fileProcessingPipe.Process(ctx, file)
+			time.Sleep(1 * time.Second) // to avoid pipline overloading
+		}
+	} else {
+		logger.FromContext(ctx).Warn("failed to select unprocessed files", "error", err.Error())
+	}
 }

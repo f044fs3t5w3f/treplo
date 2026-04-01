@@ -2,6 +2,12 @@ package models
 
 import "time"
 
+const (
+	FileStatusNew   = "NEW"
+	FileStatusDone  = "DONE"
+	FileStatusError = "ERROR"
+)
+
 type File struct {
 	ID                      int64
 	FileID                  string
@@ -16,4 +22,5 @@ type File struct {
 	Content                 *string
 	ProcessNotificationSent bool
 	CreatedAt               time.Time
+	Status                  string
 }
