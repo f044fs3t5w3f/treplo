@@ -17,11 +17,8 @@ func (p *Processor) replyToMessage(ctx context.Context, chatID int64, messageFor
 		tgError, ok := errors.AsType[tgBotApi.Error](err)
 		if ok {
 			if tgError.Code == 403 {
-				// Bot was banned in this chat
-				// TODO: Disable notification
+				logger.FromContext(ctx).Info("bot was banned", "chatID", chatID)
 			}
-			logger.FromContext(ctx).Info("replyToMessage", "chatID", chatID)
-			return nil, err
 		}
 		logger.FromContext(ctx).Error("replyToMessage", "error", err.Error())
 		return nil, fmt.Errorf("p.tgBotApi.Send: %w", err)

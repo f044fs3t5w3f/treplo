@@ -5,8 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"sync"
 	"time"
+
+	"github.com/a-kuleshov/treplo/pkg/client"
+	"golang.org/x/time/rate"
 )
 
 var ErrNotReady = errors.New("token is not ready")
@@ -19,6 +23,7 @@ type Storage struct {
 	lock         *sync.RWMutex
 	clientSecret string
 	wasStoped    bool
+	client       client.Client
 }
 
 func NewStorage(ctx context.Context, clientSecret string, scope string) (*Storage, error) {
@@ -26,11 +31,16 @@ func NewStorage(ctx context.Context, clientSecret string, scope string) (*Storag
 	if err != nil {
 		return nil, fmt.Errorf("initial getAccessToken: %w", err)
 	}
-
+	client := client.NewClient(
+		client.WithLimiter(rate.NewLimiter(1, 1), 2*time.Second),
+		client.WithRetries(1*time.Second, 2*time.Second, 3*time.Second),
+		client.WithClient(&http.Client{Timeout: 100 * time.Second}),
+	)
 	storage := Storage{
 		lock:         &sync.RWMutex{},
 		clientSecret: clientSecret,
 		token:        token,
+		client:       client,
 	}
 
 	delta := time.Duration(time.Until(expiresAt))
@@ -61,9 +71,9 @@ func NewStorage(ctx context.Context, clientSecret string, scope string) (*Storag
 
 func (s *Storage) GetToken() (string, error) {
 	s.lock.RLock()
+	defer s.lock.RUnlock()
 	if s.wasStoped {
 		return "", ErrWasStoped
 	}
-	defer s.lock.RUnlock()
 	return s.token, nil
 }

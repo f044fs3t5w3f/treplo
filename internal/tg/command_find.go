@@ -3,8 +3,8 @@ package tg
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strings"
+	"time"
 
 	"github.com/a-kuleshov/treplo/internal/business_logic"
 	tgBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -17,8 +17,10 @@ func (p *Processor) commandFind(ctx context.Context, update tgBotApi.Update, pay
 	if err == nil {
 		textParts := make([]string, 0, len(results))
 		for _, result := range results {
-			textPart := fmt.Sprintf("%d", result.File.ID)
-			textParts = append(textParts, textPart)
+			textParts = append(textParts,
+				result.File.CreatedAt.Format(time.DateTime),
+				*result.File.Content,
+			)
 		}
 		message = strings.Join(textParts, "\n")
 	} else {

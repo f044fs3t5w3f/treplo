@@ -62,8 +62,8 @@ func (s *SpeechService) CreateRecognizeTask(ctx context.Context, saluteFileId st
 		fmt.Sprintf(createRecognizeTaskPayloadTemplate, encoding, saluteFileId),
 	)
 
-	client := &http.Client{Timeout: 10 * time.Second}
-	// TODO: use client in struct instead of creating the new one
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, method, url, payload)
 
 	if err != nil {
@@ -73,7 +73,7 @@ func (s *SpeechService) CreateRecognizeTask(ctx context.Context, saluteFileId st
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Authorization", "Bearer "+token)
 
-	res, err := client.Do(req)
+	res, err := s.client.Do(req)
 	if err != nil {
 		return "", "", fmt.Errorf("client.Do: %w", err)
 	}

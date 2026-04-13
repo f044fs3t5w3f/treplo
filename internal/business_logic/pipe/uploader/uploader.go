@@ -11,14 +11,13 @@ import (
 	"github.com/a-kuleshov/treplo/internal/models"
 )
 
-const directory = "storage"
-
 type Uploader interface {
 	UploadFile(ctx context.Context, file io.Reader) (string, error)
 }
 
 type FileUploader struct {
-	Uploader Uploader
+	Uploader    Uploader
+	StoragePath string
 }
 
 func (u *FileUploader) Process(ctx context.Context, file *models.File) error {
@@ -37,7 +36,7 @@ func (u *FileUploader) uploadFile(ctx context.Context, file *models.File) (strin
 	if file.Filepath == nil {
 		return "", fmt.Errorf("%w: Filepath", errors.ErrNoField)
 	}
-	fullFilename := filepath.Join(directory, *file.Filepath)
+	fullFilename := filepath.Join(u.StoragePath, *file.Filepath)
 	f, err := os.Open(fullFilename)
 	if err != nil {
 		return "", err

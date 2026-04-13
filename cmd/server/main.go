@@ -15,13 +15,13 @@ import (
 func main() {
 	var config treplo.Config
 	configuration.ScanConfig(&config, nil)
-	fmt.Println(config)
 
-	treploSerivce, err := treplo.NewService(config)
+	treploSerivce := treplo.NewService(config)
+	err := treploSerivce.Run()
 	if err != nil {
 		slog.Error(err.Error())
+		panic(err.Error())
 	}
-	treploSerivce.Run()
 
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, os.Interrupt, syscall.SIGTERM, syscall.SIGTRAP, syscall.SIGQUIT)

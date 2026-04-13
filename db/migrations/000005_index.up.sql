@@ -1,0 +1,1 @@
+CREATE  INDEX status_chat_id_1775081348119_index ON "files" USING btree ("status","chat_id");

@@ -1,0 +1,6 @@
+CREATE TABLE users (  
+    id BIGINT NOT NULL PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50)
+);

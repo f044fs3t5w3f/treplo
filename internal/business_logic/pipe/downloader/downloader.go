@@ -19,7 +19,6 @@ type Downloader struct {
 }
 
 func NewDownloader(getFileURL GetFileURLfunc, storagePath string) (*Downloader, error) {
-	// TODO: create directory if not exists
 	return &Downloader{
 		getFileURL:  getFileURL,
 		storagePath: storagePath,
@@ -41,6 +40,7 @@ func (d *Downloader) Download(ctx context.Context, file *models.File) error {
 
 	reader, err := downloadFile(url)
 	if err != nil {
+		file.Status = models.FileStatusError
 		return err
 	}
 	defer reader.Close()

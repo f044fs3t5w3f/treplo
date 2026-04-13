@@ -21,7 +21,7 @@ func TestGetAccessTokenFromResponse_ok(t *testing.T) {
 	token, expiresAt, err := getAccessTokenFromResponse(closer)
 	assert.NoError(t, err)
 	assert.Equal(t, "token", token)
-	assert.Equal(t, time.Unix(1617814516729, 0), expiresAt)
+	assert.Equal(t, time.Unix(1617814516, 0), expiresAt)
 }
 func TestGetAccessTokenFromResponse_error(t *testing.T) {
 	badResponse := `{"error": {"status_code": 401, "message": "Authorization error: header is incorrect"}}`

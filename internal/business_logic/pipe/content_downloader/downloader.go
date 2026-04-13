@@ -25,8 +25,10 @@ func (r *Tasker) Process(ctx context.Context, file *models.File) error {
 	}
 	content, err := r.Downloader.DownloadContent(ctx, *file.ResponseFileID)
 	if err != nil {
+		file.Status = models.FileStatusError
 		return fmt.Errorf("Downloader.DownloadContent: %w", err)
 	}
 	file.Content = &content
+	file.Status = models.FileStatusDone
 	return err
 }

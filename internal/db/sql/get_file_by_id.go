@@ -6,28 +6,26 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/a-kuleshov/treplo/internal/logger"
 	"github.com/a-kuleshov/treplo/internal/models"
 )
 
 func (r *repository) GetFileByID(ctx context.Context, fileID int64) (*models.File, error) {
-	row := r.db.QueryRowContext(ctx, `
-		SELECT id, chat_id, message_id, file_id, filepath, salute_id,recognize_task_id, recognize_status, response_file_id, dialogue_content, process_notification_sent, encoding 
+	query := fmt.Sprintf(`
+		SELECT %s 
 		FROM files
 		WHERE id = $1
-	`, fileID)
+	`, selectFields)
+	row := r.db.QueryRowContext(ctx, query, fileID)
 
 	if err := row.Err(); err != nil {
-		logger.FromContext(ctx).Error("GetFileByID", "error", err.Error())
 		return nil, fmt.Errorf("db.QueryRowContext: %w", err)
 	}
 
 	file := models.File{}
-	if err := row.Scan(&file.ID, &file.ChatID, &file.MessageID, &file.FileID, &file.Filepath, &file.SaluteId, &file.RecognizeTaskID, &file.RecognizeStatus, &file.ResponseFileID, &file.Content, &file.ProcessNotificationSent, &file.Encoding); err != nil {
+	if err := row.Scan(getFieldsForScan(&file)...); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}
-		logger.FromContext(ctx).Error("GetFileByID", "error", err.Error())
 		return nil, fmt.Errorf("rows.Scan: %w", err)
 	}
 	return &file, nil

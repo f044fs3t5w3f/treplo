@@ -27,8 +27,6 @@ func (g *GigaChatService) GetAnswer(ctx context.Context, messages []Message) (st
 	g.wg.Add(1)
 	defer g.wg.Done()
 	url := "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
-	client := &http.Client{Timeout: 10 * time.Second}
-	// TODO: use client in struct instead of creating the new one
 	token, err := g.tokenStorage.GetToken()
 	if err != nil {
 		return "", fmt.Errorf("tokenStorage.GetToken: %w", err)
@@ -53,6 +51,8 @@ func (g *GigaChatService) GetAnswer(ctx context.Context, messages []Message) (st
 		return "", fmt.Errorf("encoder.Encode: %w ", err)
 	}
 
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
 	request, err := http.NewRequestWithContext(ctx, http.MethodPost, url, buf)
 	if err != nil {
 		return "", fmt.Errorf("http.NewRequestWithContext: %w ", err)
@@ -62,7 +62,7 @@ func (g *GigaChatService) GetAnswer(ctx context.Context, messages []Message) (st
 	request.Header.Add("Accept", "application/json")
 	request.Header.Add("Authorization", "Bearer "+token)
 	// request.Header.Add("RqUID", uuid)
-	response, err := client.Do(request)
+	response, err := g.client.Do(request)
 
 	// TODO: maybe make retriable
 	if err != nil {

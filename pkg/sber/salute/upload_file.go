@@ -27,8 +27,8 @@ func (s *SpeechService) UploadFile(ctx context.Context, file io.Reader) (string,
 	url := "https://smartspeech.sber.ru/rest/v1/data:upload"
 	method := http.MethodPost
 
-	client := &http.Client{Timeout: 10 * time.Second}
-	// TODO: use client in struct instead of creating the new one
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Minute)
+	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, method, url, file)
 
 	if err != nil {
@@ -38,7 +38,7 @@ func (s *SpeechService) UploadFile(ctx context.Context, file io.Reader) (string,
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Authorization", "Bearer "+token)
 
-	res, err := client.Do(req)
+	res, err := s.client.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("client.Do: %w", err)
 	}

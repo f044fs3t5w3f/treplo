@@ -1,6 +1,7 @@
 package token
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -21,7 +22,9 @@ func getAccessToken(clientSecret string, scope string) (accessToken string, expi
 
 	payload := strings.NewReader("scope=" + scope)
 
-	req, err := http.NewRequest("POST", url, payload)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, "POST", url, payload)
 
 	if err != nil {
 		fmt.Println(err)

@@ -58,8 +58,8 @@ func (s *SpeechService) DownloadContent(ctx context.Context, saluteFileId string
 
 	url := "https://smartspeech.sber.ru/rest/v1/data:download?response_file_id=" + saluteFileId
 
-	client := &http.Client{Timeout: 10 * time.Second}
-	// TODO: use client in struct instead of creating the new one
+	ctx, cancel := context.WithTimeout(ctx, 3*time.Minute)
+	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 
 	if err != nil {
@@ -68,7 +68,7 @@ func (s *SpeechService) DownloadContent(ctx context.Context, saluteFileId string
 	req.Header.Add("Accept", "application/octet-stream")
 	req.Header.Add("Authorization", "Bearer "+token)
 
-	res, err := client.Do(req)
+	res, err := s.client.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("client.Do: %w", err)
 	}

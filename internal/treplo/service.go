@@ -2,6 +2,7 @@ package treplo
 
 import (
 	"context"
+	"errors"
 	"os"
 	"sync"
 	"time"
@@ -29,12 +30,12 @@ type Treplo struct {
 	services []Stopable
 }
 
-func NewService(config Config) (*Treplo, error) {
+func NewService(config Config) *Treplo {
 	service := &Treplo{
 		wg:     &sync.WaitGroup{},
 		config: config,
 	}
-	return service, nil
+	return service
 }
 
 func (t *Treplo) Run() error {
@@ -47,38 +48,38 @@ func (t *Treplo) Run() error {
 		repository, err = sql.NewRepository(t.config.DatabaseDSN)
 		if err != nil {
 			logger.FromContext(ctx).Error("Failed to create repository", "error", err)
-			panic(err)
+			return err
 		}
 	}
 	if repository == nil {
-		panic("No repository")
+		logger.FromContext(ctx).Error("No repository")
+		return errors.New("no repository")
 	}
 	speechService, err := salute.StartSpeechService(ctx, t.config.SaluteSpeechAuthorizationKey)
 	if err != nil {
 		logger.FromContext(ctx).Error("salute.StartSpeechService", "error", err)
-		panic(err)
+		return err
 	}
 
 	gigachatService, err := gigachat.StartGigaChatService(ctx, t.config.GigachatAuthorizationKey)
 	if err != nil {
 		logger.FromContext(ctx).Error("gigachat.StartGigaChatService", "error", err)
-		panic(err)
+		return err
 	}
 
 	tgbotapi, err := tgBotApi.NewBotAPI(t.config.TgToken)
-
 	if err != nil {
 		logger.FromContext(ctx).Error("tgbotapi.NewBotAPI", "error", err)
-		panic(err)
+		return err
 	}
 
-	// TODO: run add unprocessed files to queue
 	fileProcessingPipe, err := pipe.NewPipe(ctx, repository, tgbotapi, speechService, t.config.StoragePath)
-
 	if err != nil {
 		logger.FromContext(ctx).Error("pipe.NewPipe", "error", err)
-		panic(err)
+		return err
 	}
+
+	go runUnprocessedFilesProcessing(ctx, repository, fileProcessingPipe)
 
 	business_login := business_logic.NewBusinessLogic(repository, fileProcessingPipe, gigachatService)
 	processor := tg.NewProcessor(ctx, business_login, tgbotapi)
@@ -114,4 +115,21 @@ func runTGBot(ctx context.Context, wg *sync.WaitGroup, tgbotapi *tgBotApi.BotAPI
 		}
 	})
 	logger.FromContext(ctx).Info("runTGBot done")
+}
+
+func runUnprocessedFilesProcessing(ctx context.Context, repository db.Repository, fileProcessingPipe pipe.FileProcessor) {
+	unprocessedFiles, err := repository.ListNewFiles(ctx)
+	if err == nil {
+		for _, file := range unprocessedFiles {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
+			fileProcessingPipe.Process(ctx, file)
+			time.Sleep(1 * time.Second) // to avoid pipline overloading
+		}
+	} else {
+		logger.FromContext(ctx).Warn("failed to select unprocessed files", "error", err.Error())
+	}
 }

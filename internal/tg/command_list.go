@@ -3,14 +3,13 @@ package tg
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	tgBotApi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 // Send the list of audio sent in CurrentChat
 func (p *Processor) commandList(ctx context.Context, update tgBotApi.Update) error {
-	files, err := p.businessLogic.ListAudio(ctx, update.Message.Chat.ID)
+	files, _, hasNext, err := p.businessLogic.ListAudio(ctx, update.Message.Chat.ID, 1)
 	if err != nil {
 		p.replyToMessage(
 			ctx,
@@ -29,17 +28,12 @@ func (p *Processor) commandList(ctx context.Context, update tgBotApi.Update) err
 		)
 		return nil
 	}
-	textParts := make([]string, 0, len(files))
-	for _, file := range files {
-		textPart := fmt.Sprintf("%d", file.ID)
-		textParts = append(textParts, textPart)
-	}
-	messageText := strings.Join(textParts, "\n")
-	p.replyToMessage(
-		ctx,
-		update.Message.Chat.ID,
-		update.Message.MessageID,
-		messageText,
-	)
-	return nil
+	keyboard := makeAudioFilesKeyboard(files, 1, false, hasNext)
+
+	msg := tgBotApi.NewMessage(update.Message.Chat.ID, "Выберете беседу")
+	msg.ReplyToMessageID = update.Message.MessageID
+	msg.ReplyMarkup = keyboard
+	_, err = p.tgBotApi.Send(msg)
+	return err
+
 }

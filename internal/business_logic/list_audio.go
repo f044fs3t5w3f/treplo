@@ -4,13 +4,19 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/a-kuleshov/treplo/internal/logger"
 	"github.com/a-kuleshov/treplo/internal/models"
 )
 
-func (bl *BusinessLogic) ListAudio(ctx context.Context, chatID int64) ([]*models.File, error) {
-	audioFiles, err := bl.repo.ListFilesByChatID(ctx, chatID)
+const limit = 5
+
+func (bl *BusinessLogic) ListAudio(ctx context.Context, chatID int64, page int) (files []*models.File, hasPrevious bool, hasNext bool, err error) {
+	audioFiles, hasNext, err := bl.repo.ListFilesByChatID(ctx, chatID, page, limit)
+
 	if err != nil {
-		return nil, fmt.Errorf("bl.repo.ListFilesByChatID :%w", err)
+		logger.FromContext(ctx).Error("ListAudio", "error", err.Error())
+		return nil, false, false, fmt.Errorf("bl.repo.ListFilesByChatID :%w", err)
 	}
-	return audioFiles, nil
+
+	return audioFiles, page > 1, hasNext, nil
 }
